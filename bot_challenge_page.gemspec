@@ -5,9 +5,9 @@ Gem::Specification.new do |spec|
   spec.version     = BotChallengePage::VERSION
   spec.authors     = [ "Jonathan Rochkind" ]
   spec.email       = [ "jonathan@dnil.net" ]
-  spec.homepage    = "TODO"
-  spec.summary     = "TODO: Summary of BotChallengePage."
-  spec.description = "TODO: Description of BotChallengePage."
+  spec.homepage    = "https://github.com/samvera-labs/bot_challenge_page"
+  spec.summary     = "Show a bot challenge interstitial for Rails, usually using Cloudflare Turnstile"
+  # spec.description = "TODO: Description of BotChallengePage."
   spec.license     = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the "allowed_push_host"
