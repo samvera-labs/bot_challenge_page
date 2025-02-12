@@ -1,0 +1,15 @@
+<div class="bot_challenge_page">
+  <h1 class="brand-alt-h1 mb-4">Traffic control and bot detection...</h1>
+
+  <%= render "bot_challenge_page/turnstile_widget_placeholder" %>
+
+  <noscript>
+    <div class="alert alert-danger">Sorry, Javascript is required to be enabled for our traffic check, and does not appear available.</div>
+  </noscript>
+
+  <p>If this check is preventing you from making use of our resources, make sure you have cookies enabled</p>
+
+  <script src="<%= cf_turnstile_js_url %>" async defer></script>
+
+  <%= render "bot_challenge_page/local_turnstile_script_tag" %>
+</div>

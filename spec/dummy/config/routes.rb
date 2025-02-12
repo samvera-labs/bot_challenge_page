@@ -11,4 +11,8 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  # Added for bot_challenge_page engine
+  get "/challenge", to: "bot_challenge_page/bot_challenge_page#challenge", as: :bot_detect_challenge
+  post "/challenge", to: "bot_challenge_page/bot_challenge_page#verify_challenge"
 end
