@@ -1,0 +1,6 @@
+en:
+  bot_challenge_page:
+    title: Traffic control and bot detection...
+    noscript: Sorry, Javascript is required to be enabled for our traffic check, and does not appear available.
+    blurb_html: <p>If this check is preventing you from making use of our resources, make sure you have cookies enabled.</p>
+    error: Check failed. Sorry, something has gone wrong, or your traffic looks unusual to us. You can try refreshing this page to try again.

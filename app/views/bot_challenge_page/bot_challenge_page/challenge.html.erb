@@ -1,18 +1,18 @@
 <div class="bot_challenge_page">
-  <h1 class="brand-alt-h1 mb-4">Traffic control and bot detection...</h1>
+  <h1 class="mb-4"><%= t('bot_challenge_page.title') %></h1>
 
   <%= render "bot_challenge_page/turnstile_widget_placeholder" %>
 
   <noscript>
-    <div class="alert alert-danger">Sorry, Javascript is required to be enabled for our traffic check, and does not appear available.</div>
+    <div class="alert alert-danger"><%= t('bot_challenge_page.noscript') %></div>
   </noscript>
 
-  <p>If this check is preventing you from making use of our resources, make sure you have cookies enabled</p>
+  <%= t('bot_challenge_page.blurb_html') %>
 
   <template id="botChallengePageErrorTemplate">
     <div class="alert alert-danger" role="alert">
       <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-      Check failed. Sorry, something has gone wrong, or your traffic looks unusual to us. You can try refreshing this page to try again.
+      <%= t('bot_challenge_page.error') %>
     </div>
   </template>
 
