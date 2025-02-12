@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-rails", "~> 7.1"
 
   spec.add_dependency "rails", ">= 8.0.1"
+  spec.add_dependency "rack-attack", "~> 6.7"
 end
