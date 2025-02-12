@@ -18,7 +18,9 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_development_dependency "rspec-rails", "~> 7.1"
+  spec.add_development_dependency "webmock", "~> 3.5"
 
   spec.add_dependency "rails", ">= 8.0.1"
   spec.add_dependency "rack-attack", "~> 6.7"
+  spec.add_dependency "http", "~> 5.2"
 end
