@@ -40,11 +40,8 @@
   }
 
   function _displayChallengeError() {
-    document.querySelector(".cf-turnstile").outerHTML = `
-      <div class="alert alert-danger" role="alert">
-        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-        Check failed. Sorry, something has gone wrong, or your traffic looks unusual to us. You can try refreshing this page to try again.
-      </div>
-    `;
+    const template = document.querySelector("#botChallengePageErrorTemplate");
+    const clone = template.content.cloneNode(true);
+    document.querySelector(".cf-turnstile").replaceChildren(clone);
   }
 </script>

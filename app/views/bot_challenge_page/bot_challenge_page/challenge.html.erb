@@ -9,6 +9,13 @@
 
   <p>If this check is preventing you from making use of our resources, make sure you have cookies enabled</p>
 
+  <template id="botChallengePageErrorTemplate">
+    <div class="alert alert-danger" role="alert">
+      <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+      Check failed. Sorry, something has gone wrong, or your traffic looks unusual to us. You can try refreshing this page to try again.
+    </div>
+  </template>
+
   <script src="<%= cf_turnstile_js_url %>" async defer></script>
 
   <%= render "bot_challenge_page/local_turnstile_script_tag" %>
