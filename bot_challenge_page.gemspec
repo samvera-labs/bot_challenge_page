@@ -19,6 +19,8 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "appraisal"
   spec.add_development_dependency "rspec-rails", "~> 7.1"
+  spec.add_development_dependency "capybara", "~> 3.40"
+  spec.add_development_dependency 'selenium-webdriver'
   spec.add_development_dependency "webmock", "~> 3.5"
   spec.add_development_dependency "nokogiri"
 

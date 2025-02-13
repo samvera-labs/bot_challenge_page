@@ -49,6 +49,11 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
 
+  # Capyabara.javascript_driver setting directly applies to 'feature' spec
+  Capybara.default_driver = :rack_test # Faster but doesn't do Javascript
+  Capybara.javascript_driver = ENV['SHOW_BROWSER'] ? :selenium_chrome : :selenium_chrome_headless
+
+
   # You can uncomment this line to turn off ActiveRecord support entirely.
   # config.use_active_record = false
 
