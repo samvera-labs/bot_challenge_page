@@ -103,7 +103,7 @@ module BotChallengePage
       datetime = session_data[SESSION_DATETIME_KEY]
       ip   = session_data[SESSION_IP_KEY]
 
-      (ip == request.remote_ip) && (Time.now - Time.new(datetime) < self.bot_challenge_config.session_passed_good_for )
+      (ip == request.remote_ip) && (Time.now - Time.iso8601(datetime) < self.bot_challenge_config.session_passed_good_for )
     end
 
 
