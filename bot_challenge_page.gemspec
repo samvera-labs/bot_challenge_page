@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "appraisal"
   spec.add_development_dependency "rspec-rails", "~> 7.1"
   spec.add_development_dependency "webmock", "~> 3.5"
+  spec.add_development_dependency "nokogiri"
 
   spec.add_dependency "rails", ">= 7.1", "< 8.1"
   spec.add_dependency "rack-attack", "~> 6.7"

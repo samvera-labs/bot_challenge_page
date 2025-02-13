@@ -3,6 +3,23 @@ require 'rails_helper'
 RSpec.describe BotChallengePage::BotChallengePageController, type: :controller do
   include WebmockTurnstileHelperMethods
 
+  describe "#challenge" do
+    render_views
+
+    it "renders and includes expected values" do
+      get :challenge
+
+      expect(response.body).to include I18n.t("bot_challenge_page.title")
+      expect(response.body).to include I18n.t("bot_challenge_page.blurb_html")
+
+      html = Nokogiri::HTML(response.body)
+      # this is JS api
+      errorTemplate = html.at_css("template#botChallengePageErrorTemplate")
+      expect(errorTemplate).to be_present
+      expect(errorTemplate.text).to include I18n.t("bot_challenge_page.error")
+    end
+  end
+
   describe "#verify_challenge" do
     it "handles turnstile success" do
       turnstile_response = stub_turnstile_success
