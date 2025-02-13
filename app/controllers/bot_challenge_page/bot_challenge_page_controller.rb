@@ -73,13 +73,13 @@ module BotChallengePage
 
     # Usually in your ApplicationController,
     #
-    #     before_action { |controller| BotChallengePage::BotChallengePageController.bot_detection_enforce_filter(controller) }
-    def self.bot_detection_enforce_filter(controller)
+    #     before_action { |controller| BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller) }
+    def self.bot_challenge_enforce_filter(controller)
       if self.bot_challenge_config.enabled &&
           controller.request.env[self.bot_challenge_config.env_challenge_trigger_key] &&
           ! self._bot_detect_passed_good?(controller.request) &&
           ! controller.kind_of?(self) && # don't ever guard ourself, that'd be a mess!
-          ! self.self.allow_exempt.call(controller)
+          ! self.bot_challenge_config.allow_exempt.call(controller)
 
         # we can only do GET requests right now
         if !controller.request.get?
