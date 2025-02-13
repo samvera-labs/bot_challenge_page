@@ -22,7 +22,27 @@ jobs:
   #       run: bin/rubocop -f github
 
   test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - gemfile: rails_7.1
+            ruby: 3.1
+
+          - gemfile: rails_7.2
+            ruby: 3.2
+
+          - gemfile: rails_8.0
+            ruby: 3.3
+
     runs-on: ubuntu-latest
+
+    # https://github.com/ruby/setup-ruby?tab=readme-ov-file#matrix-of-gemfiles
+    env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/${{ matrix.gemfile }}.gemfile
+
+    name: ${{ matrix.gemfile }}, ruby ${{ matrix.ruby }}
+
 
     # services:
     #  redis:
@@ -40,7 +60,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ruby-3.3.2
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
       - name: Run tests
