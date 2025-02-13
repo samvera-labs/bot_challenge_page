@@ -89,5 +89,13 @@ module BotChallengePage
 
     # key in rack env that says challenge is required
     attribute :env_challenge_trigger_key, default: "bot_detect.should_challenge"
+
+    # make sure dup dups all attributes please
+    def initialize_dup(source)
+      self.class.attr_defaults.keys.each do |attr_key|
+        instance_variable_set("@#{attr_key}", instance_variable_get("@#{attr_key}").deep_dup)
+        super
+      end
+    end
   end
 end
