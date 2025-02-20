@@ -75,9 +75,11 @@ module BotChallengePage
     # Usually in your ApplicationController,
     #
     #     before_action { |controller| BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller) }
-    def self.bot_challenge_enforce_filter(controller)
+    #
+    # @param immediate [Boolean] always force bot protection, ignore any allowed pre-challenge rate limit
+    def self.bot_challenge_enforce_filter(controller, immediate: false)
       if self.bot_challenge_config.enabled &&
-          controller.request.env[self.bot_challenge_config.env_challenge_trigger_key] &&
+          (controller.request.env[self.bot_challenge_config.env_challenge_trigger_key] || immediate) &&
           ! self._bot_detect_passed_good?(controller.request) &&
           ! controller.kind_of?(self) && # don't ever guard ourself, that'd be a mess!
           ! self.bot_challenge_config.allow_exempt.call(controller)
