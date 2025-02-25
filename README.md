@@ -1,4 +1,7 @@
 # BotChallengePage
+
+[![CI](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml/badge.svg)](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml)
+
 Short description and motivation.
 
 ## Usage
