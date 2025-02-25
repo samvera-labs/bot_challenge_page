@@ -1,0 +1,21 @@
+<h1>Some Template Rendered</h1>
+
+<%= render "bot_challenge_page/turnstile_widget_placeholder" %>
+
+<template id="botChallengePageErrorTemplate">
+  <div class="alert alert-danger" role="alert">
+    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+    <%= t('bot_challenge_page.error') %>
+  </div>
+</template>
+
+<template id="botChallengePageStillAroundTemplate" data-still_around_delay_ms="<%= still_around_delay_ms %>">
+  <div class="alert alert-info" role="alert">
+    <i class="fa fa-info-circle" aria-hidden="true"></i>
+    <%= t('bot_challenge_page.still_around') %>
+  </div>
+</template>
+
+<script src="<%= cf_turnstile_js_url %>" async defer></script>
+
+<%= render "bot_challenge_page/local_turnstile_script_tag" %>

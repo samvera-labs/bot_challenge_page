@@ -110,6 +110,11 @@ module BotChallengePage
 
 
     def challenge
+      # possible custom render to choose layouts or templates, but normally
+      # we just do default rails render and this proc is empty.
+      if self.bot_challenge_config.challenge_renderer
+        instance_exec &self.bot_challenge_config.challenge_renderer
+      end
     end
 
     def verify_challenge

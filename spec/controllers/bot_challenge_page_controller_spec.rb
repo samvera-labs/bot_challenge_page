@@ -9,6 +9,7 @@ RSpec.describe BotChallengePage::BotChallengePageController, type: :controller d
     it "renders and includes expected values" do
       get :challenge
 
+      expect(response).to have_http_status(200)
       expect(response.body).to include I18n.t("bot_challenge_page.title")
       expect(response.body).to include I18n.t("bot_challenge_page.blurb_html")
 
@@ -17,6 +18,27 @@ RSpec.describe BotChallengePage::BotChallengePageController, type: :controller d
       errorTemplate = html.at_css("template#botChallengePageErrorTemplate")
       expect(errorTemplate).to be_present
       expect(errorTemplate.text).to include I18n.t("bot_challenge_page.error")
+    end
+
+    describe "with custom render" do
+      around do |example|
+        orig = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
+        BotChallengePage::BotChallengePageController.bot_challenge_config.challenge_renderer =
+          lambda { render template: "optional/some_template", layout: "optional_layout" }
+
+        example.run
+
+        BotChallengePage::BotChallengePageController.bot_challenge_config = orig
+      end
+
+      it "renders and includes custom templates" do
+        get :challenge
+
+        expect(response).to have_http_status(200)
+
+        expect(response.body).to include("We are in optional some layout.")
+        expect(response.body).to include("Some Template Rendered")
+      end
     end
   end
 

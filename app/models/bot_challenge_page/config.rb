@@ -54,6 +54,9 @@ module BotChallengePage
     # actions from protection.
     attribute :allow_exempt, default: ->(controller, config) { false }
 
+    # replace with say `->() { render layout: 'something' }`, or `render "somedir/some_template"`
+    attribute :challenge_renderer, default: nil
+
 
     # rate limit per subnet, following lehigh's lead, although we use a smaller
     # subnet: /24 for IPv4, and /72 for IPv6
