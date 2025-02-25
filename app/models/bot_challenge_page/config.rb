@@ -52,13 +52,13 @@ module BotChallengePage
 
     # Executed at the _controller_ filter level, to last minute exempt certain
     # actions from protection.
-    attribute :allow_exempt, default: ->(controller) { false }
+    attribute :allow_exempt, default: ->(controller, config) { false }
 
 
     # rate limit per subnet, following lehigh's lead, although we use a smaller
     # subnet: /24 for IPv4, and /72 for IPv6
     # https://git.drupalcode.org/project/turnstile_protect/-/blob/0dae9f95d48f9d8cae5a8e61e767c69f64490983/src/EventSubscriber/Challenge.php#L140-151
-    attribute :rate_limit_discriminator, default: (lambda do |req|
+    attribute :rate_limit_discriminator, default: (lambda do |req, config|
       if req.ip.index(":") # ipv6
         IPAddr.new("#{req.ip}/24").to_string
       else
@@ -68,9 +68,9 @@ module BotChallengePage
       req.ip
     end)
 
-    attribute :location_matcher, default: ->(rack_req) {
+    attribute :location_matcher, default: ->(rack_req, config) {
       parsed_route = nil
-      rate_limited_locations.any? do |val|
+      config.rate_limited_locations.any? do |val|
         case val
         when Hash
           begin

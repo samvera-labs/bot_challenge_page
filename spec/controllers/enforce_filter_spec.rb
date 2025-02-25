@@ -13,7 +13,9 @@ describe DummyController, type: :controller do
 
     example.run
 
+    # reset config and  rack-attack back to orig config
     BotChallengePage::BotChallengePageController.bot_challenge_config = orig_config
+    BotChallengePage::BotChallengePageController.rack_attack_init
   end
 
   describe "when rack key requests bot challenge on protected controller" do
@@ -21,7 +23,7 @@ describe DummyController, type: :controller do
       request.env[BotChallengePage::BotChallengePageController.bot_challenge_config.env_challenge_trigger_key] = "true"
 
       # config an exemption to test
-      BotChallengePage::BotChallengePageController.bot_challenge_config.allow_exempt = ->(controller) {
+      BotChallengePage::BotChallengePageController.bot_challenge_config.allow_exempt = ->(controller, _config) {
         controller.request.headers["sec-fetch-dest"] == "empty"
       }
     end

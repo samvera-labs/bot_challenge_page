@@ -45,9 +45,8 @@ module BotChallengePage
       Rack::Attack.track("bot_detect/rate_exceeded/#{self.name}",
           limit: self.bot_challenge_config.rate_limit_count,
           period: self.bot_challenge_config.rate_limit_period) do |req|
-
-        if self.bot_challenge_config.enabled && self.bot_challenge_config.location_matcher.call(req)
-          self.bot_challenge_config.rate_limit_discriminator.call(req)
+        if self.bot_challenge_config.enabled && self.bot_challenge_config.location_matcher.call(req, self.bot_challenge_config)
+          self.bot_challenge_config.rate_limit_discriminator.call(req, self.bot_challenge_config)
         end
       end
 
@@ -55,7 +54,7 @@ module BotChallengePage
         rack_request = payload[:request]
         rack_env     = rack_request.env
         match_name = rack_env["rack.attack.matched"]  # name of rack-attack rule
-
+                                                      #
         if match_name == "bot_detect/rate_exceeded/#{self.name}"
           match_data   = rack_env["rack.attack.match_data"]
           match_data_formatted = match_data.slice(:count, :limit, :period).map { |k, v| "#{k}=#{v}"}.join(" ")
@@ -82,7 +81,7 @@ module BotChallengePage
           (controller.request.env[self.bot_challenge_config.env_challenge_trigger_key] || immediate) &&
           ! self._bot_detect_passed_good?(controller.request) &&
           ! controller.kind_of?(self) && # don't ever guard ourself, that'd be a mess!
-          ! self.bot_challenge_config.allow_exempt.call(controller)
+          ! self.bot_challenge_config.allow_exempt.call(controller, self.bot_challenge_config)
 
         # we can only do GET requests right now
         if !controller.request.get?
