@@ -1,10 +1,10 @@
 <%# we deliver our simple javascript as inline script to make deployment more
-  reliable.  %>
+  reliable without having to deal with different asset pipelines, and it's really a fine choice anyway  %>
 
 <script type="text/javascript">
   async function turnstileCallback(token) {
     try {
-      // I don't know if we should be disabling CSRF for this one, but we'll just use it
+      // I don't know if we could be disabling CSRF instead for this one, but we'll just use it
       const csrfToken = document.querySelector("[name='csrf-token']");
 
       const response = await fetch('<%= bot_detect_challenge_path %>', {
@@ -20,6 +20,15 @@
         throw new Error('bad response: ' + response.status + ": " + response.url);
       }
 
+      // This page may end up staying around on sucesss, stay if the dest url is a media
+      // type that can only be downloaded.
+      //
+      // When so, if the page stays around, it may end up
+      // calling turnstile and this callback over and over again, without an  (that
+      // we're not tracking) this will remove the most recent turnstile widget executed,
+      // we only expect one.
+      turnstile.remove();
+
       result = await response.json();
       if (result["success"] == true) {
         const dest = new URLSearchParams(window.location.search).get("dest");
@@ -27,6 +36,13 @@
         if (!dest.startsWith("/") || dest.startsWith("//")) {
           throw new Error("illegal non-local redirect: " + dest);
         }
+
+        // in case this page stays around, (say it was rediret to media asset), let's add a failsafe message after
+        // a couple seconds.
+        window.setTimeout(function() {
+          _displayStillAroundNote()
+        }, 1200);
+
         // replace the challenge page in history
         window.location.replace(dest);
       } else {
@@ -43,5 +59,13 @@
     const template = document.querySelector("#botChallengePageErrorTemplate");
     const clone = template.content.cloneNode(true);
     document.querySelector(".cf-turnstile").replaceChildren(clone);
+  }
+
+  // If the page is still around after location changed, what's up?
+  // Warn them they might need t use back button, maybe it was a media download
+  function _displayStillAroundNote() {
+    const template = document.querySelector("#botChallengePageStillAroundTemplate");
+    const clone = template.content.cloneNode(true);
+    document.querySelector(".cf-turnstile")?.after(clone);
   }
 </script>

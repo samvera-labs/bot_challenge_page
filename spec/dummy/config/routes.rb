@@ -17,5 +17,6 @@ Rails.application.routes.draw do
   post "/challenge", to: "bot_challenge_page/bot_challenge_page#verify_challenge"
 
   get "/dummy", to: "dummy#index", as: :dummy
+  get "/dummy_download", to: "dummy#download", as: :dummy_download
   get "/dummy_immediate", to: "dummy_immediate#index", as: :dummy_immediate
 end
