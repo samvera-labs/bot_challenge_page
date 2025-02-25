@@ -100,6 +100,8 @@ module BotChallengePage
     # key in rack env that says challenge is required
     attribute :env_challenge_trigger_key, default: "bot_detect.should_challenge"
 
+    attribute :still_around_delay_ms, default: 1200
+
     # make sure dup dups all attributes please
     def initialize_dup(source)
       self.class.attr_defaults.keys.each do |attr_key|

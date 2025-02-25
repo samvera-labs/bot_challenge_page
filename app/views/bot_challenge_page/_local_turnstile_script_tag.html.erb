@@ -39,9 +39,10 @@
 
         // in case this page stays around, (say it was rediret to media asset), let's add a failsafe message after
         // a couple seconds.
+        const delay = document.querySelector("#botChallengePageStillAroundTemplate")?.getAttribute("data-still-around-delay-ms") || 1200;
         window.setTimeout(function() {
           _displayStillAroundNote()
-        }, 1200);
+        }, delay);
 
         // replace the challenge page in history
         window.location.replace(dest);
