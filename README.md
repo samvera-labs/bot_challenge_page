@@ -1,6 +1,6 @@
 # BotChallengePage
 
-[![CI](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml/badge.svg)](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml)
+[![CI](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml/badge.svg)](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml) [![Gem Version](https://badge.fury.io/rb/bot_challenge_page.png)](http://badge.fury.io/rb/bot_challenge_page)
 
 BotChallengePage lets you protect certain routes in your Rails app with [CloudFlare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/) "CAPTHCA alternate" bot detector. Rather than the typical form submission use case for Turnstile, the user will be redirected to an interstitial challenge page, and redirected back on success.
 
