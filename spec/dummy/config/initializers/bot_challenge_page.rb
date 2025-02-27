@@ -28,8 +28,11 @@ Rails.application.config.to_prepare do
   # allow rate_limit_count requests in rate_limit_period, before issuing challenge
   BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_period = 12.hour
   BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_count = 2
-  
+
   # Exempt some requests from bot challenge protection
+  # This could also be a place to exempt certain user-agents or Authorization headers, to
+  # provide auth'd exemption from bot challenges.
+  #
   # BotChallengePage::BotChallengePageController.allow_exempt = ->(controller) {
   #   # controller.params
   #   # controller.request
@@ -42,7 +45,5 @@ Rails.application.config.to_prepare do
 
   # More configuration is available
 
-
   BotChallengePage::BotChallengePageController.rack_attack_init
-  
 end
