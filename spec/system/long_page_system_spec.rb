@@ -7,6 +7,10 @@ describe "Challenge page stays around persistently", type: :system do
     # shorten up the delay to make the test faster
     orig = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
     BotChallengePage::BotChallengePageController.bot_challenge_config.still_around_delay_ms = 1
+    # auto-pass-key
+    BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = "1x00000000000000000000AA"
+    BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = "1x0000000000000000000000000000000AA"
+
 
     example.run
 
