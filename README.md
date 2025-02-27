@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml/badge.svg)](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml) [![Gem Version](https://badge.fury.io/rb/bot_challenge_page.png)](http://badge.fury.io/rb/bot_challenge_page)
 
-BotChallengePage lets you protect certain routes in your Rails app with [CloudFlare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/) "CAPTHCA alternate" bot detector. Rather than the typical form submission use case for Turnstile, the user will be redirected to an interstitial challenge page, and redirected back on success.
+BotChallengePage lets you protect certain routes in your Rails app with [CloudFlare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/) "CAPTHCA alternate" bot detector. Rather than the typical form submission use case for Turnstile, the user will be redirected to an interstitial challenge page, and automatically redirected back immediately on success.
 
-The motivating use case is fairly dumb (probably AI-related) crawlers, rather than targetted attacks, although we have tried to pay attention to security.  Many of our use cases were crawlers getting caught in "infinite" page variations by following every combination of voluminous facet values in search results in a near "infinite space", and causing us resource usage issues.
+The motivating use case is fairly dumb (probably AI-related) crawlers, rather than targetted attacks, although we have tried to pay attention to security.  Many of our use cases were crawlers getting caught following every combination of voluminous facet values in search results in a near "infinite space", and causing us resource usage issues.
 
 ![challenge page screenshot](docs/challenge-page-example.png)
 
@@ -18,7 +18,7 @@ The motivating use case is fairly dumb (probably AI-related) crawlers, rather th
 
 ## Installation and Configuration
 
-* Get a CloudFlare account and Turnstile widget set up, which should give you a turnstile `sitekey` and `secret_key` you will need later in configuration.
+* Get a [CloudFlare account and Turnstile widget set up](https://www.cloudflare.com/application-services/products/turnstile/), which should give you a turnstile `sitekey` and `secret_key` you will need later in configuration.
 
 * `bundle add bot_challenge_page`, `bundle install`
 
@@ -85,7 +85,7 @@ Rails.application.config.to_prepare do
     #
     # sec-fetch-dest is set to 'empty' by browser on fetch requests, to limit us further;
     # sure an attacker could fake it, we don't mind if someone determined can avoid
-    # rate-limiting on this one action
+    # bot challenge on this one action
     ( controller.params[:action] == "facet" &&
       controller.request.headers["sec-fetch-dest"] == "empty" &&
       controller.kind_of?(CatalogController)
@@ -131,7 +131,7 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 * [My own blog post about this approach](https://bibwild.wordpress.com/2025/01/16/using-cloudflare-turnstile-to-protect-certain-pages-on-a-rails-app/).
 
-* Wow only after I developed all this did I notice [rails-cloudflare-turnstile](https://github.com/instrumentl/rails-cloudflare-turnstile) which implements some pieces that could have been re-used here, but I feel good.
+* Wow only after I developed all this did I notice [rails-cloudflare-turnstile](https://github.com/instrumentl/rails-cloudflare-turnstile) which implements some pieces that could have been re-used here, but I feel good becuase we wanted these weird features. But if you want a much simpler more straightforward Turnstile implementation for more standard use cases or your own different use cases, I'd go here.
 
 * And yet another implementation in Rails that perhaps makes more assumptions about use cases, [turnstile-captcha](https://github.com/pfeiffer/turnstile-captcha). Haven't looked at it much.
 
