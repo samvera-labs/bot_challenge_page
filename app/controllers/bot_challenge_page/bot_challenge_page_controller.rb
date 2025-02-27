@@ -1,3 +1,5 @@
+require 'http'
+
 # This controller has actions for issuing a challenge page for CloudFlare Turnstile product,
 # and then redirecting back to desired page.
 #
