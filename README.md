@@ -32,6 +32,7 @@ The motivating use case is fairly dumb (probably AI-related) crawlers, rather th
     * Note that we can only protect GET paths, and also think about making sure you DON'T protect
       any path your front-end needs JS `fetch` access to, as this would block it (at least
       without custom front-end code we haven't really explored)
+
     * If you are tempted to just protect `/` that may work, but worth thinking about any hearbeat paths, front-end requestable paths, or other machine-access-desired paths.
 
   * Some other configuration options are offered -- more advanced/specialized ones are available that are not mentioned in generated config file, see [Config class](./app/models/bot_challenge_page/config.rb)
@@ -39,7 +40,7 @@ The motivating use case is fairly dumb (probably AI-related) crawlers, rather th
 
 ## Customize challenge page display
 
-Some of the default challenge page html uses bootstrap alert classes. You may want to provide custom CSS if you aren't using bootstrap. You can see the default challenge page html at [challenge.html.erb](./app/views/bot_challenge_page/bot_challenge_page/challenge.html). You may wish to CSS-style other parts too!
+Some of the default challenge page html uses bootstrap alert classes. You may want to provide custom CSS if you aren't using bootstrap. You can see the default challenge page html at [challenge.html.erb](./app/views/bot_challenge_page/bot_challenge_page/challenge.html.erb). You may wish to CSS-style other parts too!
 
 You can customize all text via I18n, see keys in [bot_challenge_page.en.yml](./config/locales/bot_challenge_page.en.yml)
 
@@ -128,6 +129,10 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 * [Similar feature built into PHP VuFind app](https://github.com/vufind-org/vufind/pull/4079)
 
+* [My own blog post about this approach](https://bibwild.wordpress.com/2025/01/16/using-cloudflare-turnstile-to-protect-certain-pages-on-a-rails-app/).
+
 * Wow only after I developed all this did I notice [rails-cloudflare-turnstile](https://github.com/instrumentl/rails-cloudflare-turnstile) which implements some pieces that could have been re-used here, but I feel good.
 
 * And yet another implementation in Rails that perhaps makes more assumptions about use cases, [turnstile-captcha](https://github.com/pfeiffer/turnstile-captcha). Haven't looked at it much.
+
+
