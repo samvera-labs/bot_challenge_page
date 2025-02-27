@@ -8,7 +8,7 @@
 #
 #
 module BotChallengePage
-  class BotChallengePageController < ApplicationController
+  class BotChallengePageController < ::ApplicationController
     # Config for bot detection is held in class object here -- idea is
     # to support different controllers with different config protecting
     # different paths in your app if you like, is why config is with controller
