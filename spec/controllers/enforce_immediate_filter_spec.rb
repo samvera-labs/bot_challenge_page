@@ -4,6 +4,11 @@ require 'rails_helper'
 # we want
 describe DummyImmediateController, type: :controller do
 
+  before do
+    # make sure we don't even have rack-attack configured to make sure it works without it
+    BotChallengePage::BotChallengePageController._rack_attack_uninit
+  end
+
   # enable functionality, and reset config to fresh after any further changes
   around(:each) do |example|
     orig_config = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
