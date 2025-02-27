@@ -3,6 +3,7 @@ Rails.application.config.to_prepare do
   BotChallengePage::BotChallengePageController.bot_challenge_config.enabled = true
 
   # Get from CloudFlare Turnstile: https://www.cloudflare.com/application-services/products/turnstile/
+  # Some testing keys are also available: https://developers.cloudflare.com/turnstile/troubleshooting/testing/
   BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = "MUST GET"
   BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = "MUST GET"
 
