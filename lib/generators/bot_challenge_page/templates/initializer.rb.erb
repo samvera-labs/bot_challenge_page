@@ -1,6 +1,3 @@
-<%- if options[:rack_attack] %>
-require 'rack/attack'
-<% end %>
 Rails.application.config.to_prepare do
 
   BotChallengePage::BotChallengePageController.bot_challenge_config.enabled = true
@@ -18,6 +15,10 @@ Rails.application.config.to_prepare do
   #   { controller: "catalog" }
   #   { controller: "catalog", action: "index" }
   #
+  # Note that we can only protect GET paths, and also think about making sure you DON'T protect
+  # any path your front-end needs JS `fetch` access to, as this would block it (at least
+  # without custom front-end code we haven't really explored)
+
   BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limited_locations = [
   ]
 
