@@ -24,6 +24,7 @@ The motivating use case is fairly dumb (probably AI-related) crawlers, rather th
 
 * Run the installer
   * if you want to use rack-attack for some permissive pre-challenge rate, `rails g bot_challenge_page:install`
+
   * If you do not want to use rack-attack and want challenge on FIRST request, `rails g bot_challenge_page:install --without-rack-attack`
 
 * Configure in the generated `./config/initializers/bot_challenge_page.rb`
@@ -32,6 +33,7 @@ The motivating use case is fairly dumb (probably AI-related) crawlers, rather th
       any path your front-end needs JS `fetch` access to, as this would block it (at least
       without custom front-end code we haven't really explored)
     * If you are tempted to just protect `/` that may work, but worth thinking about any hearbeat paths, front-end requestable paths, or other machine-access-desired paths.
+
   * Some other configuration options are offered -- more advanced/specialized ones are available that are not mentioned in generated config file, see [Config class](./app/models/bot_challenge_page/config.rb)
 
 
@@ -93,6 +95,18 @@ Rails.application.config.to_prepare do
 end
 
 ```
+
+## Development and automated testing
+
+All logic and config hangs off a controller, with the idea that you could sub-class the controller to override any functionality -- or even have multiple sub-classes in your app with different configuration or customized config. But this hasn't really been tested/fleshed out yet.
+
+Run tests with `bundle exec rspec`.
+
+We test with a checked-into-repo dummy app at `./spec/dummy`, and use [Appraisal](https://github.com/thoughtbot/appraisal) to test under different rails versions.
+
+Locally one way to test with a specific rails version appraisal is `bundle exec appraisal rails-7.2 rspec`
+
+If you make any changes to `Gemfile` you may need to run `bundle exec appraisal install` and commit changes.
 
 ## Possible future features?
 
