@@ -7,6 +7,7 @@ Rails.application.config.to_prepare do
   BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = "MUST GET"
   BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = "MUST GET"
 
+  <%- if options[:rack_attack] %>
   # What paths do you want to protect?
   #
   # You can use path prefixes: "/catalog" or even "/"
@@ -23,14 +24,13 @@ Rails.application.config.to_prepare do
   BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limited_locations = [
   ]
 
-  # How long will a challenge success exempt a session from further challenges?
-  # BotChallengePage::BotChallengePageController.bot_challenge_config.session_passed_good_for = 36.hours
-
-  <%- if options[:rack_attack] %>
   # allow rate_limit_count requests in rate_limit_period, before issuing challenge
   BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_period = 12.hour
   BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_count = 2
   <% end -%>
+
+  # How long will a challenge success exempt a session from further challenges?
+  # BotChallengePage::BotChallengePageController.bot_challenge_config.session_passed_good_for = 36.hours
 
   # Exempt some requests from bot challenge protection
   # BotChallengePage::BotChallengePageController.allow_exempt = ->(controller) {

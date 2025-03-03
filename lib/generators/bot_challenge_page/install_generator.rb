@@ -10,12 +10,12 @@ module BotChallengePage
     end
 
     def add_before_filter_enforcement
+      # make the user do this themselves if they aren't using rack-attack, as it should
+      # only be on protected filters
+      return unless options[:rack_attack]
+
       inject_into_class "app/controllers/application_controller.rb", "ApplicationController" do
-        filter_code = if options[:rack_attack]
-          "BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller)"
-        else
-          "BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller, immediate: true)"
-        end
+        filter_code = "BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller)"
 
         <<-EOS
   # This will only protect CONFIGURED routes, but also could be put on just certain
@@ -39,6 +39,24 @@ module BotChallengePage
 
     def copy_initializer_file
       template "initializer.rb.erb", "config/initializers/bot_challenge_page.rb"
+    end
+
+    def suggest_filter
+      unless options[:rack_attack]
+        instructions = <<~EOS
+        You must add before_action to protect controllers
+
+        Add, eg:
+
+            before_action only: :index do |controller|
+              BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller, immediate: true)
+            end
+
+        To desired controllers and/or ApplicationController
+        EOS
+
+        say_status("advise", instructions, :green)
+      end
     end
 
   end

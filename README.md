@@ -25,7 +25,15 @@ The motivating use case is fairly dumb (probably AI-related) crawlers, rather th
 * Run the installer
   * if you want to use rack-attack for some permissive pre-challenge rate, `rails g bot_challenge_page:install`
 
-  * If you do not want to use rack-attack and want challenge on FIRST request, `rails g bot_challenge_page:install --without-rack-attack`
+  * If you do not want to use rack-attack and want challenge on FIRST request, `rails g bot_challenge_page:install --no-rack-attack`
+
+* If you are **not using rack-attack**, you need to add a before_action to the controller(s)
+  you'd like to protect, eg:
+
+        before_action only: :index do |controller|
+          BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller, immediate: true)
+        end
+
 
 * Configure in the generated `./config/initializers/bot_challenge_page.rb`
   * At a minimum you need to configure your Cloudflare Turnstile keys, and some paths to protect!
