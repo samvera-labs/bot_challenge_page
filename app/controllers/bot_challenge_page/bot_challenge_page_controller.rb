@@ -11,6 +11,9 @@ require 'http'
 #
 module BotChallengePage
   class BotChallengePageController < ::ApplicationController
+    include BotChallengePage::RackAttackInit
+    include BotChallengePage::EnforceFilter
+
     # Config for bot detection is held in class object here -- idea is
     # to support different controllers with different config protecting
     # different paths in your app if you like, is why config is with controller
@@ -24,91 +27,6 @@ module BotChallengePage
 
     # for allowing unsubscribe for testing
     class_attribute :_track_notification_subscription, instance_accessor: false
-
-    # perhaps in an initializer, and after changing any config, run:
-    #
-    #     Rails.application.config.to_prepare do
-    #       BotChallengePage::BotChallengePageController.rack_attack_init
-    #     end
-    #
-    # Safe to call more than once if you change config and want to call again, say in testing.
-    def self.rack_attack_init
-      self._rack_attack_uninit # make it safe for calling multiple times
-
-      ## Turnstile bot detection throttling
-      #
-      # for paths matched by `rate_limited_locations`, after over rate_limit count requests in rate_limit_period,
-      # token will be stored in rack env instructing challenge is required.
-      #
-      # For actual challenge, need before_action in controller.
-      #
-      # You could rate limit detect on wider paths than you actually challenge on, or the same. You probably
-      # don't want to rate-limit detect on narrower list of paths than you challenge on!
-      Rack::Attack.track("bot_detect/rate_exceeded/#{self.name}",
-          limit: self.bot_challenge_config.rate_limit_count,
-          period: self.bot_challenge_config.rate_limit_period) do |req|
-        if self.bot_challenge_config.enabled && self.bot_challenge_config.location_matcher.call(req, self.bot_challenge_config)
-          self.bot_challenge_config.rate_limit_discriminator.call(req, self.bot_challenge_config)
-        end
-      end
-
-      self._track_notification_subscription = ActiveSupport::Notifications.subscribe("track.rack_attack") do |_name, _start, _finish, request_id, payload|
-        rack_request = payload[:request]
-        rack_env     = rack_request.env
-        match_name = rack_env["rack.attack.matched"]  # name of rack-attack rule
-                                                      #
-        if match_name == "bot_detect/rate_exceeded/#{self.name}"
-          match_data   = rack_env["rack.attack.match_data"]
-          match_data_formatted = match_data.slice(:count, :limit, :period).map { |k, v| "#{k}=#{v}"}.join(" ")
-          discriminator = rack_env["rack.attack.match_discriminator"] # unique key for rate limit, usually includes ip
-
-          rack_env[self.bot_challenge_config.env_challenge_trigger_key] = true
-        end
-      end
-    end
-
-    def self._rack_attack_uninit
-      Rack::Attack.track("bot_detect/rate_exceeded/#{self.name}") {} # overwrite track name with empty proc
-      ActiveSupport::Notifications.unsubscribe(self._track_notification_subscription) if self._track_notification_subscription
-      self._track_notification_subscription = nil
-    end
-
-    # Usually in your ApplicationController,
-    #
-    #     before_action { |controller| BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller) }
-    #
-    # @param immediate [Boolean] always force bot protection, ignore any allowed pre-challenge rate limit
-    def self.bot_challenge_enforce_filter(controller, immediate: false)
-      if self.bot_challenge_config.enabled &&
-          (controller.request.env[self.bot_challenge_config.env_challenge_trigger_key] || immediate) &&
-          ! self._bot_detect_passed_good?(controller.request) &&
-          ! controller.kind_of?(self) && # don't ever guard ourself, that'd be a mess!
-          ! self.bot_challenge_config.allow_exempt.call(controller, self.bot_challenge_config)
-
-        # we can only do GET requests right now
-        if !controller.request.get?
-          Rails.logger.warn("#{self}: Asked to protect request we could not, unprotected: #{controller.request.method} #{controller.request.url}, (#{controller.request.remote_ip}, #{controller.request.user_agent})")
-          return
-        end
-
-        Rails.logger.info("#{self.name}: Cloudflare Turnstile challenge redirect: (#{controller.request.remote_ip}, #{controller.request.user_agent}): from #{controller.request.url}")
-        # status code temporary
-        controller.redirect_to controller.bot_detect_challenge_path(dest: controller.request.original_fullpath), status: 307
-      end
-    end
-
-    # Does the session already contain a bot detect pass that is good for this request
-    # Tie to IP address to prevent session replay shared among IPs
-    def self._bot_detect_passed_good?(request)
-      session_data = request.session[self.bot_challenge_config.session_passed_key]
-
-      return false unless session_data && session_data.kind_of?(Hash)
-
-      datetime = session_data[SESSION_DATETIME_KEY]
-      ip   = session_data[SESSION_IP_KEY]
-
-      (ip == request.remote_ip) && (Time.now - Time.iso8601(datetime) < self.bot_challenge_config.session_passed_good_for )
-    end
 
 
     def challenge
