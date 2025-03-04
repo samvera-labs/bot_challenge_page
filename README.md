@@ -117,6 +117,8 @@ Locally one way to test with a specific rails version appraisal is `bundle exec 
 
 If you make any changes to `Gemfile` you may need to run `bundle exec appraisal install` and commit changes.
 
+**One reason tests are slow** is I think we're running system tests with real turnstile proof-of-work bot detection JS code? (Or is it, when we are are using a CF turnstile testing key that always passes?).  There aren't many tests so it's no big deal, but this is something that could be investigated/optmized more potentially.  
+
 ## Possible future features?
 
 * allow regex in default location_matcher? Easy to do if you want it, just say so.
