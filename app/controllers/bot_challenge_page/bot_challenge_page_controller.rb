@@ -18,9 +18,7 @@ module BotChallengePage
     # to support different controllers with different config protecting
     # different paths in your app if you like, is why config is with controller
     class_attribute :bot_challenge_config, default: ::BotChallengePage::Config.new
-
-    delegate :cf_turnstile_js_url, :cf_turnstile_sitekey, :still_around_delay_ms, to: :bot_challenge_config
-    helper_method :cf_turnstile_js_url, :cf_turnstile_sitekey, :still_around_delay_ms
+    helper_method :bot_challenge_config
 
     SESSION_DATETIME_KEY = "t"
     SESSION_IP_KEY = "i"

@@ -1,6 +1,7 @@
+<%# locals: (bot_challenge_config:) -%>
+
 <%# we deliver our simple javascript as inline script to make deployment more
   reliable without having to deal with different asset pipelines, and it's really a fine choice anyway  %>
-
 <script type="text/javascript">
   async function turnstileCallback(token) {
     try {
