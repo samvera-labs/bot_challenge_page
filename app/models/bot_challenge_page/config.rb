@@ -55,7 +55,7 @@ module BotChallengePage
     attribute :allow_exempt, default: ->(controller, config) { false }
 
     # replace with say `->() { render layout: 'something' }`, or `render "somedir/some_template"`
-    attribute :challenge_renderer, default: nil
+    attribute :challenge_renderer, default: ->() { render "bot_challenge_page/bot_challenge_page/challenge" }
 
 
     # rate limit per subnet, following lehigh's lead, although we use a smaller

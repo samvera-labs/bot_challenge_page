@@ -29,12 +29,11 @@ module BotChallengePage
     class_attribute :_track_notification_subscription, instance_accessor: false
 
 
+    # only used if config.redirect_for_challenge is true
     def challenge
-      # possible custom render to choose layouts or templates, but normally
-      # we just do default rails render and this proc is empty.
-      if self.bot_challenge_config.challenge_renderer
-        instance_exec &self.bot_challenge_config.challenge_renderer
-      end
+      # possible custom render to choose layouts or templates, but
+      # default is what would be default template for this action
+      instance_exec &self.bot_challenge_config.challenge_renderer
     end
 
     def verify_challenge
