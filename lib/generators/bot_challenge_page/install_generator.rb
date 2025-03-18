@@ -3,10 +3,14 @@ module BotChallengePage
     source_root File.expand_path("templates", __dir__)
 
     class_option :'rack_attack', type: :boolean, default: true, desc: "Support rate-limit allowance configuration"
+    class_option :redirect_for_challenge, type: :boolean, default: false, desc: "Redirect to separate challenge page instead of inline challenge"
 
     def generate_routes
-      route 'get "/challenge", to: "bot_challenge_page/bot_challenge_page#challenge", as: :bot_detect_challenge'
-      route 'post "/challenge", to: "bot_challenge_page/bot_challenge_page#verify_challenge"'
+      route 'post "/challenge", to: "bot_challenge_page/bot_challenge_page#verify_challenge", as: :bot_detect_challenge'
+
+      if options[:redirect_for_challenge]
+        route 'get "/challenge", to: "bot_challenge_page/bot_challenge_page#challenge"'
+      end
     end
 
     def add_before_filter_enforcement

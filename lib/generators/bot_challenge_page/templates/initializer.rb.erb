@@ -4,8 +4,13 @@ Rails.application.config.to_prepare do
 
   # Get from CloudFlare Turnstile: https://www.cloudflare.com/application-services/products/turnstile/
   # Some testing keys are also available: https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+  #
+  # Always pass testing sitekey: "1x00000000000000000000AA"
   BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = "MUST GET"
+  # Always pass testing secret_key: "1x0000000000000000000000000000000AA"
   BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = "MUST GET"
+
+  BotChallengePage::BotChallengePageController.bot_challenge_config.redirect_for_challenge = <%= options[:redirect_for_challenge] %>
 
   <%- if options[:rack_attack] %>
   # What paths do you want to protect?
