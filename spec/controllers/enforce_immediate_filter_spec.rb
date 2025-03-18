@@ -22,15 +22,16 @@ describe DummyImmediateController, type: :controller do
   end
 
   describe "when rack key requests bot challenge on protected controller" do
-    it "redirects even with no ENV request" do
+    render_views
+
+    it "displays challenge even with no ENV request" do
       get :index
 
-      expect(response).to have_http_status(307)
-      expect(response).to redirect_to(bot_detect_challenge_path(dest: dummy_immediate_path))
+      expect(response).to have_http_status(403)
+      expect(response.body).to include I18n.t("bot_challenge_page.title")
     end
 
-    # we configured this to try to exempt fetch/ajax to #facet
-    it "does not redirect if we have stored a pass in session" do
+    it "displays actual page if we have stored a pass in session" do
       request.session[BotChallengePage::BotChallengePageController.bot_challenge_config.session_passed_key] = {
           BotChallengePage::BotChallengePageController::SESSION_DATETIME_KEY => Time.now.utc.iso8601,
           BotChallengePage::BotChallengePageController::SESSION_IP_KEY   => request.remote_ip

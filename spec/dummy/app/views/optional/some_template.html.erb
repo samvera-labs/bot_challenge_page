@@ -1,6 +1,6 @@
 <h1>Some Template Rendered</h1>
 
-<%= render "bot_challenge_page/turnstile_widget_placeholder", bot_challenge_config: bot_challenge_config %>
+<%= render "bot_challenge_page/turnstile_widget_placeholder", bot_challenge_config: @bot_challenge_config %>
 
 <template id="botChallengePageErrorTemplate">
   <div class="alert alert-danger" role="alert">
@@ -9,13 +9,13 @@
   </div>
 </template>
 
-<template id="botChallengePageStillAroundTemplate" data-still_around_delay_ms="<%= bot_challenge_config.still_around_delay_ms %>">
+<template id="botChallengePageStillAroundTemplate" data-still_around_delay_ms="<%= @bot_challenge_config.still_around_delay_ms %>">
   <div class="alert alert-info" role="alert">
     <i class="fa fa-info-circle" aria-hidden="true"></i>
     <%= t('bot_challenge_page.still_around') %>
   </div>
 </template>
 
-<script src="<%= bot_challenge_config.cf_turnstile_js_url %>" async defer></script>
+<script src="<%= @bot_challenge_config.cf_turnstile_js_url %>" async defer></script>
 
-<%= render "bot_challenge_page/local_turnstile_script_tag", bot_challenge_config: bot_challenge_config %>
+<%= render "bot_challenge_page/local_turnstile_script_tag", bot_challenge_config: @bot_challenge_config %>

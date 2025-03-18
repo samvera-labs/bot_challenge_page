@@ -9,7 +9,7 @@ RSpec.describe BotChallengePage::BotChallengePageController, type: :controller d
     it "renders and includes expected values" do
       get :challenge
 
-      expect(response).to have_http_status(200)
+      expect(response).to have_http_status(403)
       expect(response.body).to include I18n.t("bot_challenge_page.title")
       expect(response.body).to include I18n.t("bot_challenge_page.blurb_html")
 
@@ -48,7 +48,7 @@ RSpec.describe BotChallengePage::BotChallengePageController, type: :controller d
 
       post :verify_challenge, params: { cf_turnstile_response: "XXXX.DUMMY.TOKEN.XXXX" }
       expect(response.status).to be 200
-      expect(response.body).to eq turnstile_response.to_json
+      expect(response.body).to eq turnstile_response.merge({"redirect_for_challenge" => controller.bot_challenge_config.redirect_for_challenge}).to_json
 
       expect(session[described_class.bot_challenge_config.session_passed_key]).to be_present
       expect(Time.iso8601(session[described_class.bot_challenge_config.session_passed_key][described_class::SESSION_DATETIME_KEY])).to be_within(60).of(Time.now.utc)
@@ -61,7 +61,7 @@ RSpec.describe BotChallengePage::BotChallengePageController, type: :controller d
 
       post :verify_challenge, params: { cf_turnstile_response: "XXXX.DUMMY.TOKEN.XXXX" }
       expect(response.status).to be 200
-      expect(response.body).to eq turnstile_response.to_json
+      expect(response.body).to eq turnstile_response.merge({"redirect_for_challenge" => controller.bot_challenge_config.redirect_for_challenge}).to_json
 
       expect(session[described_class.bot_challenge_config.session_passed_key]).not_to be_present
     end

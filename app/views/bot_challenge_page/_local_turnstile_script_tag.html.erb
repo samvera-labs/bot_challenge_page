@@ -32,12 +32,6 @@
 
       result = await response.json();
       if (result["success"] == true) {
-        const dest = new URLSearchParams(window.location.search).get("dest");
-        // For security make sure it only has path and on
-        if (!dest.startsWith("/") || dest.startsWith("//")) {
-          throw new Error("illegal non-local redirect: " + dest);
-        }
-
         // in case this page stays around, (say it was rediret to media asset), let's add a failsafe message after
         // a couple seconds.
         const delay = document.querySelector("#botChallengePageStillAroundTemplate")?.getAttribute("data-still-around-delay-ms") || 1200;
@@ -45,8 +39,19 @@
           _displayStillAroundNote()
         }, delay);
 
-        // replace the challenge page in history
-        window.location.replace(dest);
+        if (result["redirect_for_challenge"] == true) {
+          const dest = new URLSearchParams(window.location.search).get("dest");
+          // For security make sure it only has path and on
+          if (!dest.startsWith("/") || dest.startsWith("//")) {
+            throw new Error("illegal non-local redirect: " + dest);
+          }
+
+          // replace the challenge page in history
+          window.location.replace(dest);
+        } else {
+          // just need to reload and now we'll get through
+          window.location.reload();
+        }
       } else {
         console.error("Turnstile response reported as failure: " + JSON.stringify(result))
         _displayChallengeError();

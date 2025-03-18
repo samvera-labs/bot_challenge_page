@@ -1,8 +1,12 @@
 class DummyController < ApplicationController
-  before_action { |controller| BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller) }
+  # normal one for index
+  before_action(only: :index) { |controller| BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller) }
+
+  # immediate one for download please
+  before_action(only: :download) { |controller| BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller, immediate: true) }
 
   def index
-    render plain: "rendered action dummy"
+    render plain: "rendered action dummy#index"
   end
 
   # just give us download content-disposition headers to test that

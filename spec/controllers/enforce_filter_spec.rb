@@ -19,6 +19,8 @@ describe DummyController, type: :controller do
   end
 
   describe "when rack key requests bot challenge on protected controller" do
+    render_views
+
     before do
       request.env[BotChallengePage::BotChallengePageController.bot_challenge_config.env_challenge_trigger_key] = "true"
 
@@ -28,11 +30,31 @@ describe DummyController, type: :controller do
       }
     end
 
-    it "redirects when requested" do
+    it "challenges when requested" do
       get :index
 
-      expect(response).to have_http_status(307)
-      expect(response).to redirect_to(bot_detect_challenge_path(dest: dummy_path))
+      expect(response).to have_http_status(403)
+      expect(response.body).to include I18n.t("bot_challenge_page.title")
+      expect(response.body).to include I18n.t("bot_challenge_page.blurb_html")
+    end
+
+    describe "with redirect_for_challenge" do
+      around do |example|
+        orig_config = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
+        BotChallengePage::BotChallengePageController.bot_challenge_config.redirect_for_challenge = true
+        BotChallengePage::BotChallengePageController.rack_attack_init
+
+        example.run
+
+        BotChallengePage::BotChallengePageController.bot_challenge_config = orig_config
+      end
+
+      it "redirects when requested" do
+        get :index
+
+        expect(response).to have_http_status(307)
+        expect(response).to redirect_to(bot_detect_challenge_path(dest: dummy_path))
+      end
     end
 
     # we configured this to try to exempt fetch/ajax to #facet
