@@ -59,7 +59,6 @@ To customize the layout or challenge page HTML more further, you can use configu
 ```ruby
 BotChallengePage::BotChallengePageController.bot_challenge_config.challenge_renderer = ()->  {
   render "my_local_view_folder/whatever", layout "another_layout"
-  render layout: "another_layout" # default html but change layout. etc.
 }
 ```
 
@@ -117,7 +116,7 @@ Locally one way to test with a specific rails version appraisal is `bundle exec 
 
 If you make any changes to `Gemfile` you may need to run `bundle exec appraisal install` and commit changes.
 
-**One reason tests are slow** is I think we're running system tests with real turnstile proof-of-work bot detection JS code? (Or is it, when we are are using a CF turnstile testing key that always passes?).  There aren't many tests so it's no big deal, but this is something that could be investigated/optmized more potentially.  
+**One reason tests are slow** is I think we're running system tests with real turnstile proof-of-work bot detection JS code? (Or is it, when we are are using a CF turnstile testing key that always passes?).  There aren't many tests so it's no big deal, but this is something that could be investigated/optmized more potentially.
 
 ## Possible future features?
 
