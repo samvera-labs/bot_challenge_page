@@ -28,6 +28,7 @@ describe DummyImmediateController, type: :controller do
       get :index
 
       expect(response).to have_http_status(403)
+      expect(response.headers["Cache-Control"]).to eq "no-store"
       expect(response.body).to include I18n.t("bot_challenge_page.title")
     end
 

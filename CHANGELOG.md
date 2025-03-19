@@ -7,3 +7,7 @@
   if you've done customization of templates you will have to re-do it new way, based
   on new templates. (i18n overrides are still fine and backwards compat). Sorry,
   we are pre-1.0 because we are still figuring out the API patterns we need!
+
+* Also means challenge pages are delivered with HTTP status 403 now. And headers for no http
+  caching.
+
