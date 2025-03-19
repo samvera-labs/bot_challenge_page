@@ -19,25 +19,15 @@ describe "Turnstile bot limiting", type: :system do
   # Temporarily change desired mocked config
   # Kinda hacky because we need to keep re-registering the tracks
   around(:each) do |example|
-    orig_config = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
-
-    BotChallengePage::BotChallengePageController.bot_challenge_config.enabled = true
-    BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = cf_turnstile_sitekey
-    BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = cf_turnstile_secret_key
-    BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_count = rate_limit_count
-
-    BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limited_locations = [
+    with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+      enabled: true,
+      cf_turnstile_sitekey: cf_turnstile_sitekey,
+      cf_turnstile_secret_key:  cf_turnstile_secret_key,
+      rate_limit_count: rate_limit_count,
+      rate_limited_locations: [
       "/dummy"
-    ]
-
-    BotChallengePage::BotChallengePageController.rack_attack_init
-
-    example.run
-
-    BotChallengePage::BotChallengePageController.bot_challenge_config = orig_config
-
-    # reset rack
-    BotChallengePage::BotChallengePageController.rack_attack_init
+      ]
+    ) { example.run }
   end
 
   describe "succesful challenge" do
@@ -67,12 +57,9 @@ describe "Turnstile bot limiting", type: :system do
 
     describe "with redirect_for_challenge" do
       around do |example|
-        orig = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
-        BotChallengePage::BotChallengePageController.bot_challenge_config.redirect_for_challenge = true
-
-        example.run
-
-        BotChallengePage::BotChallengePageController.bot_challenge_config = orig
+        with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+          redirect_for_challenge: true
+        ) { example.run }
       end
 
       it "smoke tests" do

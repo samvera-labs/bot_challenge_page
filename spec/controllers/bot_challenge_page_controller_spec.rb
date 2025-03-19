@@ -22,13 +22,11 @@ RSpec.describe BotChallengePage::BotChallengePageController, type: :controller d
 
     describe "with custom render" do
       around do |example|
-        orig = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
-        BotChallengePage::BotChallengePageController.bot_challenge_config.challenge_renderer =
-          lambda { render template: "optional/some_template", layout: "optional_layout" }
+        with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+          challenge_renderer: lambda { render template: "optional/some_template", layout: "optional_layout" }) do
 
-        example.run
-
-        BotChallengePage::BotChallengePageController.bot_challenge_config = orig
+          example.run
+        end
       end
 
       it "renders and includes custom templates" do

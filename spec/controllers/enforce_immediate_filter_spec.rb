@@ -11,14 +11,9 @@ describe DummyImmediateController, type: :controller do
 
   # enable functionality, and reset config to fresh after any further changes
   around(:each) do |example|
-    orig_config = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
-    BotChallengePage::BotChallengePageController.bot_challenge_config.enabled = true
-
-    example.run
-
-    # reset config and  rack-attack back to orig config
-    BotChallengePage::BotChallengePageController.bot_challenge_config = orig_config
-    BotChallengePage::BotChallengePageController.rack_attack_init
+    with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+      enabled: true
+    ) { example.run }
   end
 
   describe "when rack key requests bot challenge on protected controller" do
