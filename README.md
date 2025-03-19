@@ -121,13 +121,12 @@ Rails.application.config.to_prepare do
   BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_count = 3
 
   BotChallengePage::BotChallengePageController.allow_exempt = ->(controller) {
-    # Excempt any Catalog #facet action that looks like an ajax/fetch request, the redirect
-    # ain't gonna work there, we just exempt it.
+    # Excempt any Catalog #facet or #range_limit action that looks like an ajax/fetch request, the # challenge isn't going to work there, we just exempt it.
     #
     # sec-fetch-dest is set to 'empty' by browser on fetch requests, to limit us further;
     # sure an attacker could fake it, we don't mind if someone determined can avoid
     # bot challenge on this one action
-    ( controller.params[:action] == "facet" &&
+    ( controller.params[:action].in?(["facet", "range_limit"]) &&
       controller.request.headers["sec-fetch-dest"] == "empty" &&
       controller.kind_of?(CatalogController)
     )
