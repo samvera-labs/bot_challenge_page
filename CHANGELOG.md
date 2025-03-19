@@ -13,4 +13,4 @@
 
 * fix `allow_exempt` example in comment in generated initializer. Thanks @lfarrell, https://github.com/samvera-labs/bot_challenge_page/pull/5
 
-* No longer by default logs when a page is blocked for challenge, but can log how you want with config `after_challenge`. https://github.com/samvera-labs/bot_challenge_page/pull/7
+* No longer by default logs when a page is blocked for challenge, but can log how you want with config `after_blocked`. https://github.com/samvera-labs/bot_challenge_page/pull/7

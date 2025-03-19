@@ -74,7 +74,7 @@ If you'd like to log or observe challenge issues, you can configure a proc that 
 in the context of the controller, and is called when a page is blocked by a challenge.
 
 ```ruby
-BotChallengePage::BotChallengePageController.bot_challenge_config.after_challenge = (_bot_challenge_class)->  {
+BotChallengePage::BotChallengePageController.bot_challenge_config.after_blocked = (_bot_challenge_class)->  {
   logger.info("page blocked by challenge: #{request.uri}")
 }
 ```
@@ -82,7 +82,7 @@ BotChallengePage::BotChallengePageController.bot_challenge_config.after_challeng
 Or, here's how I managed to get it in [lograge](https://github.com/roidrage/lograge), so a page blocked results in a `bot_chlng=true` param in a lograge line.
 
 ```ruby
-BotChallengePage::BotChallengePageController.bot_challenge_config.after_challenge =
+BotChallengePage::BotChallengePageController.bot_challenge_config.after_blocked =
   ->(bot_detect_class) {
     request.env["bot_detect.blocked_for_challenge"] = true
   }

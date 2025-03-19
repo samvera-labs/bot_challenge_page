@@ -60,7 +60,7 @@ describe DummyController, type: :controller do
         $self = nil
         $arg = nil
         with_bot_challenge_config(BotChallengePage::BotChallengePageController,
-          after_challenge: ->(bot_detect_class) {
+           after_blocked: ->(bot_detect_class) {
             $triggered = true;
             $self = self;
             $arg = bot_detect_class

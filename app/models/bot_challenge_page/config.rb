@@ -63,7 +63,7 @@ module BotChallengePage
       render "bot_challenge_page/bot_challenge_page/challenge", status: 403
     }
 
-    attribute :after_challenge, default: ->(bot_detect_class) {}
+    attribute :after_blocked, default: ->(bot_detect_class) {}
 
 
     # rate limit per subnet, following lehigh's lead, although we use a smaller

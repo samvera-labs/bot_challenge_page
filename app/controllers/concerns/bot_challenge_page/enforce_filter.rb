@@ -38,7 +38,7 @@ module BotChallengePage
           end
 
           # allow app to see and log if desired
-          controller.instance_exec(self, &self.bot_challenge_config.after_challenge)
+          controller.instance_exec(self, &self.bot_challenge_config.after_blocked)
         end
       end
 
