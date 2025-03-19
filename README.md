@@ -27,6 +27,8 @@ The motivating use case is fairly dumb (probably AI-related) crawlers, rather th
 
   * If you do not want to use rack-attack and want challenge on FIRST request, `rails g bot_challenge_page:install --no-rack-attack`
 
+  * By default challenge pages are "inline" at protected URL. To redirect to a separate challenge page URL instead, `--redirect-for-challenge`
+
 * If you are **not using rack-attack**, you need to add a before_action to the controller(s)
   you'd like to protect, eg:
 
