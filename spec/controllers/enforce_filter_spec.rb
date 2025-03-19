@@ -53,5 +53,28 @@ describe DummyController, type: :controller do
       expect(response).to have_http_status(:success) # not a redirect
       expect(response.body).to include "rendered action"
     end
+
+    describe "custom challenge logging" do
+      around do |example|
+        $triggered = false
+        $self = nil
+        $arg = nil
+        with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+          after_challenge: ->(bot_detect_class) {
+            $triggered = true;
+            $self = self;
+            $arg = bot_detect_class
+          }
+        ) { example.run }
+      end
+
+      it "calls it" do
+        get :index
+
+        expect($triggered).to be true
+        expect($self).to be_an_instance_of(DummyController)
+        expect($arg).to be BotChallengePage::BotChallengePageController
+      end
+    end
   end
 end

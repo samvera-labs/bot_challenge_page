@@ -64,6 +64,38 @@ BotChallengePage::BotChallengePageController.bot_challenge_config.challenge_rend
 }
 ```
 
+## Logging
+
+By default we log when a challenge result is submitted to the back-end; you can find challenge passes or failures by searching your logs for `BotChallengePage`.
+
+We do not log when a challenge is issued -- experience shows challenge issues far outnumber challenge results, and can fill up the logs too fast.
+
+If you'd like to log or observe challenge issues, you can configure a proc that is executed
+in the context of the controller, and is called when a page is blocked by a challenge.
+
+```ruby
+BotChallengePage::BotChallengePageController.bot_challenge_config.after_challenge = (_bot_challenge_class)->  {
+  logger.info("page blocked by challenge: #{request.uri}")
+}
+```
+
+Or, here's how I managed to get it in [lograge](https://github.com/roidrage/lograge), so a page blocked results in a `bot_chlng=true` param in a lograge line.
+
+```ruby
+BotChallengePage::BotChallengePageController.bot_challenge_config.after_challenge =
+  ->(bot_detect_class) {
+    request.env["bot_detect.blocked_for_challenge"] = true
+  }
+
+
+# production.rb
+config.lograge.custom_payload do |controller|
+  {
+    bot_chlng: controller.request.env["bot_detect.blocked_for_challenge"]
+  }.compact
+end
+```
+
 ## Example possible Blacklight config
 
 Many of us in my professional community use [blacklight](https://github.com/projectblacklight/blacklight).  Here's a possible sample blacklight config to:

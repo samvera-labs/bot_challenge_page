@@ -52,7 +52,6 @@ describe "Turnstile bot limiting", type: :system do
 
       # which eventually will reload and display original desired page page
       expect(page).to have_content(/rendered action dummy/, wait: 4)
-      expect(Rails.logger).to have_received(:info).with(/BotChallengePage::BotChallengePageController: Cloudflare Turnstile challenge redirect/)
     end
 
     describe "with redirect_for_challenge" do
@@ -72,7 +71,6 @@ describe "Turnstile bot limiting", type: :system do
 
         # which eventually will redirect back to original page
         expect(page).to have_content(/rendered action dummy/, wait: 4)
-        expect(Rails.logger).to have_received(:info).with(/BotChallengePage::BotChallengePageController: Cloudflare Turnstile challenge redirect/)
       end
     end
   end

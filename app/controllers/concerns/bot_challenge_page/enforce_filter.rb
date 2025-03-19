@@ -25,8 +25,6 @@ module BotChallengePage
             return
           end
 
-          Rails.logger.info("#{self.name}: Cloudflare Turnstile challenge redirect: (#{controller.request.remote_ip}, #{controller.request.user_agent}): from #{controller.request.url}")
-
           # Prevent caching of bot challenge page
           controller.response.headers["Cache-Control"] = "no-store"
 
@@ -38,6 +36,9 @@ module BotChallengePage
             controller.instance_variable_set("@bot_challenge_config", self.bot_challenge_config) unless controller.instance_variable_get("@bot_challenge_config")
             controller.instance_exec &self.bot_challenge_config.challenge_renderer
           end
+
+          # allow app to see and log if desired
+          controller.instance_exec(self, &self.bot_challenge_config.after_challenge)
         end
       end
 
