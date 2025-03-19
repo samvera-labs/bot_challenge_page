@@ -6,16 +6,8 @@ describe DummyController, type: :controller do
 
   # enable functionality, and reset config to fresh after any further changes
   around(:each) do |example|
-    orig_config = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
-
-    BotChallengePage::BotChallengePageController.bot_challenge_config.enabled = true
-    BotChallengePage::BotChallengePageController.rack_attack_init
-
-    example.run
-
-    # reset config and  rack-attack back to orig config
-    BotChallengePage::BotChallengePageController.bot_challenge_config = orig_config
-    BotChallengePage::BotChallengePageController.rack_attack_init
+    with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+      enabled: true) { example.run }
   end
 
   describe "when rack key requests bot challenge on protected controller" do
@@ -41,13 +33,8 @@ describe DummyController, type: :controller do
 
     describe "with redirect_for_challenge" do
       around do |example|
-        orig_config = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
-        BotChallengePage::BotChallengePageController.bot_challenge_config.redirect_for_challenge = true
-        BotChallengePage::BotChallengePageController.rack_attack_init
-
-        example.run
-
-        BotChallengePage::BotChallengePageController.bot_challenge_config = orig_config
+        with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+          redirect_for_challenge: true) { example.run }
       end
 
       it "redirects when requested" do

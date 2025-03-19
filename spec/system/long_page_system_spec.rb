@@ -5,18 +5,12 @@ describe "Challenge page stays around persistently", type: :system do
 
   around do |example|
     # shorten up the delay to make the test faster
-    orig = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
-    BotChallengePage::BotChallengePageController.bot_challenge_config.still_around_delay_ms = 1
-
-    # auto-pass-key
-    BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = "1x00000000000000000000AA"
-    BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = "1x0000000000000000000000000000000AA"
-
-    BotChallengePage::BotChallengePageController.rack_attack_init
-
-    example.run
-
-    BotChallengePage::BotChallengePageController.bot_challenge_config = orig
+    with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+      still_around_delay_ms: 1,
+      # auto-pass-key
+      cf_turnstile_sitekey: "1x00000000000000000000AA",
+      cf_turnstile_secret_key: "1x0000000000000000000000000000000AA"
+    ) { example.run }
   end
 
   before do
@@ -39,12 +33,9 @@ describe "Challenge page stays around persistently", type: :system do
 
   describe "with redirect" do
     around do |example|
-      orig = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
-      BotChallengePage::BotChallengePageController.bot_challenge_config.redirect_for_challenge = true
-
-      example.run
-
-      BotChallengePage::BotChallengePageController.bot_challenge_config = orig
+      with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+        redirect_for_challenge: true
+      ) { example.run }
     end
 
     it "shows appropriate message" do
