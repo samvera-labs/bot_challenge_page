@@ -56,13 +56,37 @@ describe "Turnstile bot limiting", type: :system do
       visit dummy_path
       expect(page).to have_content(/rendered action dummy/)
 
-      # on second try, we're gonna get redirected to bot check page
+      # on second try, we're gonna get a challenge page instead
       visit dummy_path
       expect(page).to have_content(I18n.t("bot_challenge_page.title"))
 
-      # which eventually will redirect back to search.
+      # which eventually will reload and display original desired page page
       expect(page).to have_content(/rendered action dummy/, wait: 4)
       expect(Rails.logger).to have_received(:info).with(/BotChallengePage::BotChallengePageController: Cloudflare Turnstile challenge redirect/)
+    end
+
+    describe "with redirect_for_challenge" do
+      around do |example|
+        orig = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
+        BotChallengePage::BotChallengePageController.bot_challenge_config.redirect_for_challenge = true
+
+        example.run
+
+        BotChallengePage::BotChallengePageController.bot_challenge_config = orig
+      end
+
+      it "smoke tests" do
+        visit dummy_path
+        expect(page).to have_content(/rendered action dummy/)
+
+        # on second try, we're gonna get redirected to bot check page
+        visit dummy_path
+        expect(page).to have_content(I18n.t("bot_challenge_page.title"))
+
+        # which eventually will redirect back to original page
+        expect(page).to have_content(/rendered action dummy/, wait: 4)
+        expect(Rails.logger).to have_received(:info).with(/BotChallengePage::BotChallengePageController: Cloudflare Turnstile challenge redirect/)
+      end
     end
   end
 

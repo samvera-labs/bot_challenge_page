@@ -1,5 +1,6 @@
+<%# locals: (bot_challenge_config:) -%>
 <div
   class="cf-turnstile"
-  data-sitekey="<%= cf_turnstile_sitekey %>"
+  data-sitekey="<%= bot_challenge_config.cf_turnstile_sitekey %>"
   data-callback="turnstileCallback"
 ></div>

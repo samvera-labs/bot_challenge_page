@@ -27,6 +27,10 @@ module BotChallengePage
       end
     end
 
+    # Should we redirect to a challenge page (true) or just display it inline
+    # with a 403 status (false)
+    attribute :redirect_for_challenge, default: false
+
     attribute :enabled, default: false # Must set to true to turn on at all
 
     attribute :cf_turnstile_sitekey, default: "1x00000000000000000000AA" # a testing key that always passes
@@ -55,7 +59,9 @@ module BotChallengePage
     attribute :allow_exempt, default: ->(controller, config) { false }
 
     # replace with say `->() { render layout: 'something' }`, or `render "somedir/some_template"`
-    attribute :challenge_renderer, default: nil
+    attribute :challenge_renderer, default: ->() {
+      render "bot_challenge_page/bot_challenge_page/challenge", status: 403
+    }
 
 
     # rate limit per subnet, following lehigh's lead, although we use a smaller

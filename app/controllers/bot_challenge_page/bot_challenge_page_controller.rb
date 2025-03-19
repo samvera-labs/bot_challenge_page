@@ -19,9 +19,6 @@ module BotChallengePage
     # different paths in your app if you like, is why config is with controller
     class_attribute :bot_challenge_config, default: ::BotChallengePage::Config.new
 
-    delegate :cf_turnstile_js_url, :cf_turnstile_sitekey, :still_around_delay_ms, to: :bot_challenge_config
-    helper_method :cf_turnstile_js_url, :cf_turnstile_sitekey, :still_around_delay_ms
-
     SESSION_DATETIME_KEY = "t"
     SESSION_IP_KEY = "i"
 
@@ -29,19 +26,22 @@ module BotChallengePage
     class_attribute :_track_notification_subscription, instance_accessor: false
 
 
+    # only used if config.redirect_for_challenge is true
     def challenge
-      # possible custom render to choose layouts or templates, but normally
-      # we just do default rails render and this proc is empty.
-      if self.bot_challenge_config.challenge_renderer
-        instance_exec &self.bot_challenge_config.challenge_renderer
-      end
+      # possible custom render to choose layouts or templates, but
+      # default is what would be default template for this action
+      #
+      # We put it in instancevar as a hacky way of passing to template that can be fulfilled
+      # both here and in arbitrary controllers for direct render.
+      @bot_challenge_config = bot_challenge_config
+      instance_exec &self.bot_challenge_config.challenge_renderer
     end
 
     def verify_challenge
       body = {
         secret: self.bot_challenge_config.cf_turnstile_secret_key,
         response: params["cf_turnstile_response"],
-        remoteip: request.remote_ip
+        remoteip: request.remote_ip,
       }
 
       http = HTTP.timeout(self.bot_challenge_config.cf_timeout)
@@ -64,7 +64,10 @@ module BotChallengePage
         Rails.logger.warn("#{self.class.name}: Cloudflare Turnstile validation failed (#{request.remote_ip}, #{request.user_agent}): #{result}: #{params["dest"]}")
       end
 
-      # let's just return the whole thing to client? Is there anything confidential there?
+      # add config needed by JS to result
+      result["redirect_for_challenge"] = self.bot_challenge_config.redirect_for_challenge
+
+      # and let's just return the whole thing to client? Is there anything confidential there?
       render json: result
     rescue HTTP::Error, JSON::ParserError => e
       # probably an http timeout? or something weird.

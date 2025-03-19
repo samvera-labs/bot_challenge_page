@@ -26,8 +26,18 @@ module BotChallengePage
           end
 
           Rails.logger.info("#{self.name}: Cloudflare Turnstile challenge redirect: (#{controller.request.remote_ip}, #{controller.request.user_agent}): from #{controller.request.url}")
-          # status code temporary
-          controller.redirect_to controller.bot_detect_challenge_path(dest: controller.request.original_fullpath), status: 307
+
+          # Prevent caching of bot challenge page
+          controller.response.headers["Cache-Control"] = "no-store"
+
+          if self.bot_challenge_config.redirect_for_challenge
+            # status code temporary
+            controller.redirect_to controller.bot_detect_challenge_path(dest: controller.request.original_fullpath), status: 307
+          else
+            # hacky way to get config to view template in an arbitrary controller, good enough for now
+            controller.instance_variable_set("@bot_challenge_config", self.bot_challenge_config) unless controller.instance_variable_get("@bot_challenge_config")
+            controller.instance_exec &self.bot_challenge_config.challenge_renderer
+          end
         end
       end
 
