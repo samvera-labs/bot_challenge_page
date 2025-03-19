@@ -57,11 +57,4 @@ describe "Challenge page stays around persistently", type: :system do
       expect(page).to have_text(I18n.t('bot_challenge_page.still_around'), wait: 7) # it takes a while sorry not sure why
     end
   end
-
-  describe "without redirect" do
-    around do |example|
-      orig = BotChallengePage::BotChallengePageController.bot_challenge_config.dup
-
-    end
-  end
 end
