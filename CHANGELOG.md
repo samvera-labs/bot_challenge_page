@@ -11,3 +11,4 @@
 * Also means challenge pages are delivered with HTTP status 403 now. And headers for no http
   caching.
 
+* fix `allow_exempt` example in comment in generated initializer. Thanks @lfarrell, https://github.com/samvera-labs/bot_challenge_page/pull/5
