@@ -169,6 +169,8 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 * Joe's [similar plugin for drupal](https://drupal.org/project/turnstile_protect)
 
+* Joe's [similar plugin for traefik reverse-proxy](https://github.com/libops/captcha-protect)
+
 * [Similar feature built into PHP VuFind app](https://github.com/vufind-org/vufind/pull/4079)
 
 * [My own blog post about this approach](https://bibwild.wordpress.com/2025/01/16/using-cloudflare-turnstile-to-protect-certain-pages-on-a-rails-app/).
