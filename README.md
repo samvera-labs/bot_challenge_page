@@ -120,7 +120,7 @@ Rails.application.config.to_prepare do
   BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_period = 36.hour
   BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_count = 3
 
-  BotChallengePage::BotChallengePageController.allow_exempt = ->(controller) {
+  BotChallengePage::BotChallengePageController.allow_exempt = ->(controller, config) {
     # Excempt any Catalog #facet or #range_limit action that looks like an ajax/fetch request, the # challenge isn't going to work there, we just exempt it.
     #
     # sec-fetch-dest is set to 'empty' by browser on fetch requests, to limit us further;
