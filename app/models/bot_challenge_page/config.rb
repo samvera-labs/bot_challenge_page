@@ -71,9 +71,9 @@ module BotChallengePage
     # https://git.drupalcode.org/project/turnstile_protect/-/blob/0dae9f95d48f9d8cae5a8e61e767c69f64490983/src/EventSubscriber/Challenge.php#L140-151
     attribute :rate_limit_discriminator, default: (lambda do |req, config|
       if req.ip.index(":") # ipv6
-        IPAddr.new("#{req.ip}/24").to_string
-      else
         IPAddr.new("#{req.ip}/72").to_string
+      else
+        IPAddr.new("#{req.ip}/24").to_string
       end
     rescue IPAddr::InvalidAddressError
       req.ip

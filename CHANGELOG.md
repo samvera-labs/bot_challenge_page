@@ -1,3 +1,8 @@
+## 0.3.1
+
+* Fix proper calculations of subnet for rate-limiting. Wasn't working properly before,
+  only single IP address was being used for IPv4. https://github.com/samvera-labs/bot_challenge_page/pull/8
+
 ## 0.3.0
 
 * New direct inline challenge (instead of redirect) available and is default.
