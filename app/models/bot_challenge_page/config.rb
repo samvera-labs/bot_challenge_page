@@ -66,14 +66,14 @@ module BotChallengePage
     attribute :after_blocked, default: ->(bot_detect_class) {}
 
 
-    # rate limit per subnet, following lehigh's lead, although we use a smaller
-    # subnet: /24 for IPv4, and /72 for IPv6
+    # rate limit per subnet, follow lehigh's lead with
+    # subnet: /16 for IPv4 (x.y.*.*), and /64 for IPv6 (about the same size subnet for better or worse)
     # https://git.drupalcode.org/project/turnstile_protect/-/blob/0dae9f95d48f9d8cae5a8e61e767c69f64490983/src/EventSubscriber/Challenge.php#L140-151
     attribute :rate_limit_discriminator, default: (lambda do |req, config|
       if req.ip.index(":") # ipv6
-        IPAddr.new("#{req.ip}/72").to_string
+        IPAddr.new("#{req.ip}/64").to_string
       else
-        IPAddr.new("#{req.ip}/24").to_string
+        IPAddr.new("#{req.ip}/16").to_string
       end
     rescue IPAddr::InvalidAddressError
       req.ip

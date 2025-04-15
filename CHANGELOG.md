@@ -1,3 +1,7 @@
+## 0.4.0
+
+* Expand default buckets for rate limits to  /16 for IPv4 (x.y.*.*), and /64 for IPv6. https://github.com/samvera-labs/bot_challenge_page/pull/11
+
 ## 0.3.1
 
 * Fix proper calculations of subnet for rate-limiting. Wasn't working properly before,
