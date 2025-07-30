@@ -36,7 +36,7 @@ module BotChallengePage
             **before_action_options)
         else
           before_action(unless: generated_unless, **before_action_options) do
-            ActiveSupport::Notifications.instrument("bot_challenge_page.action_controller", request: request) do
+            ActiveSupport::Notifications.instrument("before_action.bot_challenge_page", request: request) do
               challenge_controller.bot_challenge_enforce_filter(self)
             end
           end
