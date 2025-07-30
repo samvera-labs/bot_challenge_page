@@ -40,6 +40,21 @@ describe DummyRateLimitController, type: :controller do
       expect(response.body).to include "rendered #immediate"
     end
 
+    describe "with allow_exempt config" do
+      around do |example|
+        with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+          allow_exempt: ->(controller, config) {
+            controller.params["allow_exempt_param"] == "true"
+          }
+        ) { example.run }
+      end
+
+      it "does not challenge when met" do
+        get :immediate, params: { allow_exempt_param: "true"}
+        expect(response).to have_http_status(:success)
+      end
+    end
+
     describe "with redirect_for_challenge" do
       around do |example|
         with_bot_challenge_config(BotChallengePage::BotChallengePageController,
@@ -54,7 +69,7 @@ describe DummyRateLimitController, type: :controller do
       end
     end
 
-    describe "custom challenge logging" do
+    describe "custom challenge logging via after_blocked" do
       around do |example|
         $triggered = false
         $self = nil
@@ -125,6 +140,24 @@ describe DummyRateLimitController, type: :controller do
 
       get :rate_limit_1, params: { fake_skip_rate_limit_1: "true"}
       expect(response).to have_http_status(:success)
+    end
+
+    describe "with allow_exempt config" do
+      around do |example|
+        with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+          allow_exempt: ->(controller, config) {
+            controller.params["allow_exempt_param"] == "true"
+          }
+        ) { example.run }
+      end
+
+      it "does not challenge when met" do
+        get :rate_limit_1, params: { allow_exempt_param: "true"}
+        expect(response).to have_http_status(:success)
+
+        get :rate_limit_1, params: { allow_exempt_param: "true"}
+        expect(response).to have_http_status(:success)
+      end
     end
 
     it "does not challenge if pass is stored in session" do

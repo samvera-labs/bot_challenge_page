@@ -14,20 +14,27 @@ module BotChallengePage
                         name: nil,
                         **before_action_options)
 
+
+
+        unless_arg = before_action_options.delete(:unless)
+        generated_unless = -> {
+          (unless_arg && instance_exec(&unless_arg)) ||
+          (challenge_controller.bot_challenge_config.allow_exempt.call(self, challenge_controller.bot_challenge_config))
+        }
+
         if after
-          # check arguments
           unless within
             raise ArgumentError.new("either both or neither of `after` and `within` must be speciied")
           end
-          # require name?
 
           rate_limit(to: after, within: within, by: by,  store: store, name: name,
             with: ->{
               challenge_controller.bot_challenge_enforce_filter(self)
             },
+            unless: generated_unless,
             **before_action_options)
         else
-          before_action(**before_action_options) do
+          before_action(unless: generated_unless, **before_action_options) do
             ActiveSupport::Notifications.instrument("bot_challenge_page.action_controller", request: request) do
               challenge_controller.bot_challenge_enforce_filter(self)
             end

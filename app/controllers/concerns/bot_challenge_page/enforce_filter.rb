@@ -14,8 +14,7 @@ module BotChallengePage
       def bot_challenge_enforce_filter(controller, immediate: false)
         if self.bot_challenge_config.enabled &&
             ! self._bot_detect_passed_good?(controller.request) &&
-            ! controller.kind_of?(self) && # don't ever guard ourself, that'd be a mess!
-            ! self.bot_challenge_config.allow_exempt.call(controller, self.bot_challenge_config)
+            ! controller.kind_of?(self) # don't ever guard ourself, that'd be a mess!
 
           # we can only do GET requests right now
           if !controller.request.get?
