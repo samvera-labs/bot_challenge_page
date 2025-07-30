@@ -37,15 +37,16 @@ Rails.application.config.to_prepare do
   # How long will a challenge success exempt a session from further challenges?
   # BotChallengePage::BotChallengePageController.bot_challenge_config.session_passed_good_for = 36.hours
 
-  # Exempt some requests from bot challenge protection
-  # BotChallengePage::BotChallengePageController.bot_challenge_config.allow_exempt = ->(controller) {
-  #   # controller.params
-  #   # controller.request
-  #   # controller.session
+  # Filter to omit requests from bot challenge control, executed in controller instance context
+  #
+  # BotChallengePage::BotChallengePageController.bot_challenge_config.except_filter = ->(config) {
+  #   # params
+  #   # request
+  #   # session
 
   #   # Here's a way to identify browser `fetch` API requests; note
   #   # it can be faked by an "attacker"
-  #   controller.request.headers["sec-fetch-dest"] == "empty"
+  #   request.headers["sec-fetch-dest"] == "empty"
   # }
 
   # More configuration is available

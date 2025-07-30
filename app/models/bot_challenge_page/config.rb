@@ -44,9 +44,9 @@ module BotChallengePage
     attribute :session_passed_good_for,  default: 24.hours
 
 
-    # Executed at the _controller_ filter level, to last minute exempt certain
-    # actions from protection.
-    attribute :allow_exempt, default: ->(controller, config) { false }
+    # Executed inside a controller instance, to omit a request from bot challenge.
+    # Adds on to :unless arg.
+    attribute :except_filter, default: ->(config) { false }
 
     # replace with say `->() { render layout: 'something' }`, or `render "somedir/some_template"`
     attribute :challenge_renderer, default: ->() {

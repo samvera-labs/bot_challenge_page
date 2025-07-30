@@ -40,17 +40,17 @@ describe DummyRateLimitController, type: :controller do
       expect(response.body).to include "rendered #immediate"
     end
 
-    describe "with allow_exempt config" do
+    describe "with except_filter config" do
       around do |example|
         with_bot_challenge_config(BotChallengePage::BotChallengePageController,
-          allow_exempt: ->(controller, config) {
-            controller.params["allow_exempt_param"] == "true"
+          except_filter: ->(config) {
+            params["except_filter_param"] == "true"
           }
         ) { example.run }
       end
 
       it "does not challenge when met" do
-        get :immediate, params: { allow_exempt_param: "true"}
+        get :immediate, params: { except_filter_param: "true"}
         expect(response).to have_http_status(:success)
       end
     end
@@ -142,20 +142,20 @@ describe DummyRateLimitController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    describe "with allow_exempt config" do
+    describe "with except_filter config" do
       around do |example|
         with_bot_challenge_config(BotChallengePage::BotChallengePageController,
-          allow_exempt: ->(controller, config) {
-            controller.params["allow_exempt_param"] == "true"
+          except_filter: ->(config) {
+            params["except_filter_param"] == "true"
           }
         ) { example.run }
       end
 
       it "does not challenge when met" do
-        get :rate_limit_1, params: { allow_exempt_param: "true"}
+        get :rate_limit_1, params: { except_filter_param: "true"}
         expect(response).to have_http_status(:success)
 
-        get :rate_limit_1, params: { allow_exempt_param: "true"}
+        get :rate_limit_1, params: { except_filter_param: "true"}
         expect(response).to have_http_status(:success)
       end
     end
