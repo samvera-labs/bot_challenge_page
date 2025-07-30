@@ -69,8 +69,27 @@ module BotChallengePage
       req.ip
     end)
 
+    # fingerprint is taken when "pass" is stored in session. client
+    # fingerprint needs to be the same to use pass, or else it's rejected.
+    #
+    # Algorithm parts based on advice from Xe laso @ Anubis, with variations.
+    #
+    # Allow exact IP to change -- various IPv6 and NAT can make it -- but within limited
+    # subnet.  But also force some other headers to match, which they should if it's the same
+    # user-agent, which it should be if it's re-using a cookie.
     attribute :session_valid_fingerprint, default: ->(request) {
-      request.remote_ip
+      ip_subnet_base = if request.remote_ip.index(":") #ipv6
+        IPAddr.new("#{request.remote_ip}/64").to_string
+      else
+        IPAddr.new("#{request.remote_ip}/24").to_string
+      end
+
+      [
+        request.user_agent,
+        request.headers['sec-ch-ua-platform'],
+        request.headers['accept-encoding'],
+        ip_subnet_base
+      ].join(":")
     }
 
 
