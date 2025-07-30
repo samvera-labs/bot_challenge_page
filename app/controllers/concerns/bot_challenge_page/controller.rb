@@ -11,7 +11,7 @@ module BotChallengePage
                           challenge_controller.bot_challenge_config.rate_limit_discriminator.call(request, challenge_controller.bot_challenge_config)
                         },
                         store: challenge_controller.bot_challenge_config.store || cache_store,
-                        name: nil,
+                        counter: nil,
                         **before_action_options)
 
 
@@ -27,7 +27,8 @@ module BotChallengePage
             raise ArgumentError.new("either both or neither of `after` and `within` must be speciied")
           end
 
-          rate_limit(to: after, within: within, by: by,  store: store, name: name,
+          self._bot_challenge_rate_limit_with_context(to: after, within: within, by: by,  store: store,
+            context: ["bot_challenge", counter].compact.join('.'),
             with: ->{
               challenge_controller.bot_challenge_enforce_filter(self)
             },
@@ -39,6 +40,46 @@ module BotChallengePage
               challenge_controller.bot_challenge_enforce_filter(self)
             end
           end
+        end
+      end
+
+
+      # Copied from https://github.com/rails/rails/pull/55299, it's just rails rate_limit with added
+      # `context` arg which we need
+      #
+      # https://github.com/rails/rails/pull/55299/commits/b9b7a7a8ab6e50c654619ae42e2b342ab7617f91
+      #
+      # If this is merged into rails in future, we can use plain old rate_limit
+      #
+      def _bot_challenge_rate_limit_with_context(to:, within:, by: -> { request.remote_ip }, with: -> { head :too_many_requests }, store: cache_store, name: nil, context: nil, **options)
+        before_action -> { _bot_challenge_rate_limiting_with_context(to: to, within: within, by: by, with: with, store: store, name: name, context: context) }, **options
+      end
+    end
+
+    private
+
+    # Copied from https://github.com/rails/rails/pull/55299, it's just rails rate_limit with added
+    # `context` arg which we need
+    #
+    # https://github.com/rails/rails/pull/55299/commits/b9b7a7a8ab6e50c654619ae42e2b342ab7617f91
+    #
+    # If this is merged into rails in future, we can use plain old rate_limit
+    #
+    def _bot_challenge_rate_limiting_with_context(to:, within:, by:, with:, store:, name:, context:)
+      by = instance_exec(&by)
+      cache_key = ["rate-limit", context || controller_path, name, by].compact.join(":")
+      count = store.increment(cache_key, 1, expires_in: within)
+      if count && count > to
+        ActiveSupport::Notifications.instrument("rate_limit.action_controller",
+            request: request,
+            count: count,
+            to: to,
+            within: within,
+            by: by,
+            name: name,
+            context: context,
+            cache_key: cache_key) do
+          instance_exec(&with)
         end
       end
     end

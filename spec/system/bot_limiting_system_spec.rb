@@ -14,8 +14,6 @@ describe "Turnstile bot limiting", type: :system do
   let(:cf_turnstile_secret_key_pass) { "1x0000000000000000000000000000000AA" } # a testing key always passes
   let(:cf_turnstile_secret_key_fail) { "2x0000000000000000000000000000000AA" } # a testing key that produces failure
 
-  let(:rate_limit_count) { 1 } # one hit then challenge
-
   # Temporarily change desired mocked config
   # Kinda hacky because we need to keep re-registering the tracks
   around(:each) do |example|
