@@ -24,7 +24,8 @@ describe DummyRateLimitController, type: :controller do
     it "displays actual page if we have stored a pass in session" do
       request.session[BotChallengePage::BotChallengePageController.bot_challenge_config.session_passed_key] = {
           BotChallengePage::BotChallengePageController::SESSION_DATETIME_KEY => Time.now.utc.iso8601,
-          BotChallengePage::BotChallengePageController::SESSION_IP_KEY   => request.remote_ip
+          BotChallengePage::BotChallengePageController::SESSION_FINGERPRINT_KEY   =>
+            BotChallengePage::BotChallengePageController.bot_challenge_config.session_valid_fingerprint.call(request)
       }
 
       get :immediate
@@ -163,7 +164,8 @@ describe DummyRateLimitController, type: :controller do
     it "does not challenge if pass is stored in session" do
       request.session[BotChallengePage::BotChallengePageController.bot_challenge_config.session_passed_key] = {
           BotChallengePage::BotChallengePageController::SESSION_DATETIME_KEY => Time.now.utc.iso8601,
-          BotChallengePage::BotChallengePageController::SESSION_IP_KEY   => request.remote_ip
+          BotChallengePage::BotChallengePageController::SESSION_FINGERPRINT_KEY   =>
+            BotChallengePage::BotChallengePageController.bot_challenge_config.session_valid_fingerprint.call(request)
       }
 
       get :rate_limit_1

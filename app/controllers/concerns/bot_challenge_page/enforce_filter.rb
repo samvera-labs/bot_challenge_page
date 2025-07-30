@@ -47,9 +47,11 @@ module BotChallengePage
         return false unless session_data && session_data.kind_of?(Hash)
 
         datetime = session_data[BotChallengePageController::SESSION_DATETIME_KEY]
-        ip   = session_data[BotChallengePageController::SESSION_IP_KEY]
 
-        (ip == request.remote_ip) && (Time.now - Time.iso8601(datetime) < self.bot_challenge_config.session_passed_good_for )
+        fingerprint   = session_data[BotChallengePageController::SESSION_FINGERPRINT_KEY]
+
+        (Time.now - Time.iso8601(datetime) < self.bot_challenge_config.session_passed_good_for ) &&
+        fingerprint == self.bot_challenge_config.session_valid_fingerprint.call(request)
       end
     end
   end

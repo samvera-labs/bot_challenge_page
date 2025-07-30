@@ -19,7 +19,7 @@ module BotChallengePage
     class_attribute :bot_challenge_config, default: ::BotChallengePage::Config.new
 
     SESSION_DATETIME_KEY = "t"
-    SESSION_IP_KEY = "i"
+    SESSION_FINGERPRINT_KEY = "f"
 
     # only used if config.redirect_for_challenge is true
     def challenge
@@ -53,7 +53,7 @@ module BotChallengePage
         Rails.logger.info("#{self.class.name}: Cloudflare Turnstile validation passed api (#{request.remote_ip}, #{request.user_agent}): #{params["dest"]}")
         session[self.bot_challenge_config.session_passed_key] = {
           SESSION_DATETIME_KEY => Time.now.utc.iso8601,
-          SESSION_IP_KEY   => request.remote_ip
+          SESSION_FINGERPRINT_KEY   => self.bot_challenge_config.session_valid_fingerprint.call(request)
         }
       else
         Rails.logger.warn("#{self.class.name}: Cloudflare Turnstile validation failed (#{request.remote_ip}, #{request.user_agent}): #{result}: #{params["dest"]}")

@@ -69,6 +69,10 @@ module BotChallengePage
       req.ip
     end)
 
+    attribute :session_valid_fingerprint, default: ->(request) {
+      request.remote_ip
+    }
+
 
     attribute :cf_turnstile_js_url, default: "https://challenges.cloudflare.com/turnstile/v0/api.js"
     attribute :cf_turnstile_validation_url, default:  "https://challenges.cloudflare.com/turnstile/v0/siteverify"
