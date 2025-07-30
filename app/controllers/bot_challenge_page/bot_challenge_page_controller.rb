@@ -11,7 +11,6 @@ require 'http'
 #
 module BotChallengePage
   class BotChallengePageController < ::ApplicationController
-    include BotChallengePage::RackAttackInit
     include BotChallengePage::EnforceFilter
 
     # Config for bot detection is held in class object here -- idea is
@@ -21,10 +20,6 @@ module BotChallengePage
 
     SESSION_DATETIME_KEY = "t"
     SESSION_IP_KEY = "i"
-
-    # for allowing unsubscribe for testing
-    class_attribute :_track_notification_subscription, instance_accessor: false
-
 
     # only used if config.redirect_for_challenge is true
     def challenge

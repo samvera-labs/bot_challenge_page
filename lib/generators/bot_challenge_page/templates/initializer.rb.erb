@@ -49,8 +49,4 @@ Rails.application.config.to_prepare do
   # }
 
   # More configuration is available
-
-  <%- if options[:rack_attack] %>
-  BotChallengePage::BotChallengePageController.rack_attack_init
-  <% end %>
 end

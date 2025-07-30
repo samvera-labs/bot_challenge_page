@@ -3,10 +3,10 @@ require 'rails_helper'
 describe "Turnstile bot limiting", type: :system do
   include WebmockTurnstileHelperMethods
 
-  # We need an actual cache to keep track of rate limit, while in test we normally have nullstore
   before do
-    memstore = ActiveSupport::Cache::MemoryStore.new
-    allow(Rack::Attack.cache).to receive(:store).and_return(memstore)
+    # not sure why this breaks it, but it seems to be memory store by default, fine.
+    #ActionController::Base.cache_store = :memory_store
+    ActionController::Base.cache_store.clear
   end
 
 
@@ -23,10 +23,6 @@ describe "Turnstile bot limiting", type: :system do
       enabled: true,
       cf_turnstile_sitekey: cf_turnstile_sitekey,
       cf_turnstile_secret_key:  cf_turnstile_secret_key,
-      rate_limit_count: rate_limit_count,
-      rate_limited_locations: [
-      "/dummy"
-      ]
     ) { example.run }
   end
 
@@ -43,15 +39,15 @@ describe "Turnstile bot limiting", type: :system do
     end
 
     it "smoke tests" do
-      visit dummy_path
-      expect(page).to have_content(/rendered action dummy/)
+      visit dummy_rate_limit_1_path
+      expect(page).to have_content(/rendered #rate_limit_1/)
 
       # on second try, we're gonna get a challenge page instead
-      visit dummy_path
+      visit dummy_rate_limit_1_path
       expect(page).to have_content(I18n.t("bot_challenge_page.title"))
 
       # which eventually will reload and display original desired page page
-      expect(page).to have_content(/rendered action dummy/, wait: 4)
+      expect(page).to have_content(/rendered #rate_limit_1/, wait: 4)
     end
 
     describe "with redirect_for_challenge" do
@@ -62,15 +58,15 @@ describe "Turnstile bot limiting", type: :system do
       end
 
       it "smoke tests" do
-        visit dummy_path
-        expect(page).to have_content(/rendered action dummy/)
+        visit dummy_rate_limit_1_path
+        expect(page).to have_content(/rendered #rate_limit_1/)
 
         # on second try, we're gonna get redirected to bot check page
-        visit dummy_path
+        visit dummy_rate_limit_1_path
         expect(page).to have_content(I18n.t("bot_challenge_page.title"))
 
         # which eventually will redirect back to original page
-        expect(page).to have_content(/rendered action dummy/, wait: 4)
+        expect(page).to have_content(/rendered #rate_limit_1/, wait: 4)
       end
     end
   end
@@ -88,11 +84,11 @@ describe "Turnstile bot limiting", type: :system do
     end
 
     it "stays on page with failure" do
-      visit dummy_path
-      expect(page).to have_content(/rendered action dummy/)
+      visit dummy_rate_limit_1_path
+      expect(page).to have_content(/rendered #rate_limit_1/)
 
       # on second try, we're gonna get redirected to bot check page
-      visit dummy_path
+      visit dummy_rate_limit_1_path
       expect(page).to have_content(I18n.t("bot_challenge_page.title"))
 
       # which is going to get a failure message

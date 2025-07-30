@@ -7,14 +7,12 @@ module BotChallengePage
     extend ActiveSupport::Concern
 
     class_methods do
-      # Usually in your ApplicationController, unless using `immediate`.
+      # All the logic for enforcing bot challenge protection, usually in a before_filter
+      # of some kind, direct or rate_limit.
       #
-      #     before_action { |controller| BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller) }
-      #
-      # @param immediate [Boolean] always force bot protection, ignore any allowed pre-challenge rate limit
+      # Render challenge page when necessary, otherwise do nothing allowing ordinary rails render.
       def bot_challenge_enforce_filter(controller, immediate: false)
         if self.bot_challenge_config.enabled &&
-            (controller.request.env[self.bot_challenge_config.env_challenge_trigger_key] || immediate) &&
             ! self._bot_detect_passed_good?(controller.request) &&
             ! controller.kind_of?(self) && # don't ever guard ourself, that'd be a mess!
             ! self.bot_challenge_config.allow_exempt.call(controller, self.bot_challenge_config)
