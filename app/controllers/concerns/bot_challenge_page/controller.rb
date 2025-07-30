@@ -8,7 +8,7 @@ module BotChallengePage
                         after:nil,
                         within:nil,
                         by: ->{
-                          challenge_controller.bot_challenge_config.rate_limit_discriminator.call(request, challenge_controller.bot_challenge_config)
+                          instance_exec(challenge_controller.bot_challenge_config, &challenge_controller.bot_challenge_config.default_limit_by)
                         },
                         store: challenge_controller.bot_challenge_config.store || cache_store,
                         counter: nil,
