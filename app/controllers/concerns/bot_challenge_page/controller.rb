@@ -30,14 +30,14 @@ module BotChallengePage
           self._bot_challenge_rate_limit_with_context(to: after, within: within, by: by,  store: store,
             context: ["bot_challenge", counter].compact.join('.'),
             with: ->{
-              challenge_controller.bot_challenge_enforce_filter(self)
+              challenge_controller.bot_challenge_guard_action(self)
             },
             unless: generated_unless,
             **before_action_options)
         else
           before_action(unless: generated_unless, **before_action_options) do
             ActiveSupport::Notifications.instrument("before_action.bot_challenge_page", request: request) do
-              challenge_controller.bot_challenge_enforce_filter(self)
+              challenge_controller.bot_challenge_guard_action(self)
             end
           end
         end

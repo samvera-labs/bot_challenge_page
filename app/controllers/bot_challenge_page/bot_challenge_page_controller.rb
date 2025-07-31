@@ -11,7 +11,7 @@ require 'http'
 #
 module BotChallengePage
   class BotChallengePageController < ::ApplicationController
-    include BotChallengePage::EnforceFilter
+    include BotChallengePage::GuardAction
 
     # Config for bot detection is held in class object here -- idea is
     # to support different controllers with different config protecting

@@ -3,7 +3,7 @@ module BotChallengePage
   # Extracted to concern in separate file mostly for readability, not expected to be used
   # anywehre but BotChallengePageController -- we hang all logic off controller to allow multiple
   # controllers in an app, and over-ride in sub-classes.
-  module EnforceFilter
+  module GuardAction
     extend ActiveSupport::Concern
 
     class_methods do
@@ -11,7 +11,7 @@ module BotChallengePage
       # of some kind, direct or rate_limit.
       #
       # Render challenge page when necessary, otherwise do nothing allowing ordinary rails render.
-      def bot_challenge_enforce_filter(controller, immediate: false)
+      def bot_challenge_guard_action(controller, immediate: false)
         if self.bot_challenge_config.enabled &&
             ! self._bot_detect_passed_good?(controller.request) &&
             ! controller.kind_of?(self) # don't ever guard ourself, that'd be a mess!
