@@ -41,6 +41,21 @@ describe DummyRateLimitController, type: :controller do
       expect(response.body).to include "rendered #immediate"
     end
 
+    context "enabled false" do
+      around(:each) do |example|
+        with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+          enabled: false
+        ) { example.run }
+      end
+
+      it "displays actual page" do
+        get :immediate
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include "rendered #immediate"
+      end
+    end
+
     describe "with except_filter config" do
       around do |example|
         with_bot_challenge_config(BotChallengePage::BotChallengePageController,
@@ -141,6 +156,22 @@ describe DummyRateLimitController, type: :controller do
 
       get :rate_limit_1, params: { fake_skip_rate_limit_1: "true"}
       expect(response).to have_http_status(:success)
+    end
+
+    context "enabled false" do
+      around(:each) do |example|
+        with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+          enabled: false
+        ) { example.run }
+      end
+
+      it "does not challenge" do
+        get :rate_limit_1
+        expect(response).to have_http_status(:success)
+
+        get :rate_limit_1
+        expect(response).to have_http_status(:success)
+      end
     end
 
     describe "with except_filter config" do

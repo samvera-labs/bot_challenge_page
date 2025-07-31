@@ -21,7 +21,7 @@ module BotChallengePage
     # with a 403 status (false)
     attribute :redirect_for_challenge, default: false
 
-    attribute :enabled, default: false # Must set to true to turn on at all
+    attribute :enabled, default: true
 
     # ActiveSupport::Cache::Store to use for rate info, if nil will use Controller #cache_store
     attribute :store
