@@ -50,13 +50,13 @@ module BotChallengePage
     # subnet: /16 for IPv4 (x.y.*.*), and /64 for IPv6 (about the same size subnet for better or worse)
     # https://git.drupalcode.org/project/turnstile_protect/-/blob/0dae9f95d48f9d8cae5a8e61e767c69f64490983/src/EventSubscriber/Challenge.php#L140-151
     attribute :default_limit_by, default: (lambda do |config|
-      if request.ip.index(":") # ipv6
-        IPAddr.new("#{request.ip}/64").to_string
+      if request.remote_ip.index(":") # ipv6
+        IPAddr.new("#{request.remote_ip}/64").to_string
       else
-        IPAddr.new("#{request.ip}/16").to_string
+        IPAddr.new("#{request.remote_ip}/16").to_string
       end
     rescue IPAddr::InvalidAddressError
-      req.ip
+      req.remote_ip
     end)
 
     # fingerprint is taken when "pass" is stored in session. client
