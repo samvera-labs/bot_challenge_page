@@ -56,17 +56,17 @@ describe DummyRateLimitController, type: :controller do
       end
     end
 
-    describe "with except_filter config" do
+    describe "with skip_when config" do
       around do |example|
         with_bot_challenge_config(BotChallengePage::BotChallengePageController,
-          except_filter: ->(config) {
-            params["except_filter_param"] == "true"
+          skip_when: ->(config) {
+            params["skip_when_param"] == "true"
           }
         ) { example.run }
       end
 
       it "does not challenge when met" do
-        get :immediate, params: { except_filter_param: "true"}
+        get :immediate, params: { skip_when_param: "true"}
         expect(response).to have_http_status(:success)
       end
     end
@@ -174,20 +174,20 @@ describe DummyRateLimitController, type: :controller do
       end
     end
 
-    describe "with except_filter config" do
+    describe "with skip_when config" do
       around do |example|
         with_bot_challenge_config(BotChallengePage::BotChallengePageController,
-          except_filter: ->(config) {
-            params["except_filter_param"] == "true"
+          skip_when: ->(config) {
+            params["skip_when_param"] == "true"
           }
         ) { example.run }
       end
 
       it "does not challenge when met" do
-        get :rate_limit_1, params: { except_filter_param: "true"}
+        get :rate_limit_1, params: { skip_when_param: "true"}
         expect(response).to have_http_status(:success)
 
-        get :rate_limit_1, params: { except_filter_param: "true"}
+        get :rate_limit_1, params: { skip_when_param: "true"}
         expect(response).to have_http_status(:success)
       end
     end

@@ -19,7 +19,7 @@ module BotChallengePage
         unless_arg = before_action_options.delete(:unless)
         generated_unless = -> {
           (unless_arg && instance_exec(&unless_arg)) ||
-          instance_exec(challenge_controller.bot_challenge_config, &challenge_controller.bot_challenge_config.except_filter)
+          instance_exec(challenge_controller.bot_challenge_config, &challenge_controller.bot_challenge_config.skip_when)
         }
 
         if after

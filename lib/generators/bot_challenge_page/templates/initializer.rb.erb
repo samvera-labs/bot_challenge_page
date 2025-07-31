@@ -39,7 +39,7 @@ Rails.application.config.to_prepare do
 
   # Filter to omit requests from bot challenge control, executed in controller instance context
   #
-  # BotChallengePage::BotChallengePageController.bot_challenge_config.except_filter = ->(config) {
+  # BotChallengePage::BotChallengePageController.bot_challenge_config.skip_when = ->(config) {
   #   # params
   #   # request
   #   # session

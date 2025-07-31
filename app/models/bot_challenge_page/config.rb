@@ -36,7 +36,7 @@ module BotChallengePage
 
     # Executed inside a controller instance, to omit a request from bot challenge.
     # Adds on to :unless arg.
-    attribute :except_filter, default: ->(config) { false }
+    attribute :skip_when, default: ->(config) { false }
 
     # replace with say `->() { render layout: 'something' }`, or `render "somedir/some_template"`
     attribute :challenge_renderer, default: ->() {
