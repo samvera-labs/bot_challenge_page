@@ -13,17 +13,7 @@ module BotChallengePage
 
     def initialize(**values)
       self.class.attr_defaults.merge(values).each_pair do |key, value|
-        # super hacky way to execute any procs in the context of this config,
-        # so they can access other config values easily.
-        if value.kind_of?(Proc)
-          newval = lambda do |*args|
-            self.instance_exec(*args, &value)
-          end
-        else
-          newval = value
-        end
-
-        send("#{key}=", newval)
+        send("#{key}=", value)
       end
     end
 
