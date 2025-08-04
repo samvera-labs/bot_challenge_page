@@ -13,10 +13,12 @@ module BotChallengePage
   class BotChallengePageController < ::ApplicationController
     include BotChallengePage::GuardAction
 
-    # Config for bot detection is held in class object here -- idea is
-    # to support different controllers with different config protecting
-    # different paths in your app if you like, is why config is with controller
-    class_attribute :bot_challenge_config, default: ::BotChallengePage::Config.new
+    # We access all config at the controller level, intending to support
+    # a design of different controllers in the same app with different config, protecting
+    # different parts of your app.
+    #
+    # But most people won't use that, just default to a global config for simplicity.
+    class_attribute :bot_challenge_config, default: ::BotChallengePage.config
 
     SESSION_DATETIME_KEY = "t"
     SESSION_FINGERPRINT_KEY = "f"

@@ -1,14 +1,13 @@
-Rails.application.config.to_prepare do
 
-  BotChallengePage::BotChallengePageController.bot_challenge_config.enabled = true
+BotChallengePage.config.enabled = true
 
-  # Get from CloudFlare Turnstile: https://www.cloudflare.com/application-services/products/turnstile/
-  BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = "1x00000000000000000000AA"
-  BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = "1x0000000000000000000000000000000AA"
+# Get from CloudFlare Turnstile: https://www.cloudflare.com/application-services/products/turnstile/
+BotChallengePage.config.cf_turnstile_sitekey = "1x00000000000000000000AA"
+BotChallengePage.config.cf_turnstile_secret_key = "1x0000000000000000000000000000000AA"
 
 
-  # How long will a challenge success exempt a session from further challenges?
-  # BotChallengePage::BotChallengePageController.bot_challenge_config.session_passed_good_for = 36.hours
+# How long will a challenge success exempt a session from further challenges?
+# BotChallengePage.config.session_passed_good_for = 36.hours
 
-  # More configuration is available
-end
+# More configuration is available
+
