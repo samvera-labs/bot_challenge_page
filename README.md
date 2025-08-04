@@ -39,15 +39,15 @@ You can add `bot_challenge` to a controller to protect all actions in that contr
 
 You can also use all the Rails `before_action` params to apply to only some actions or requests in that controller: `only` and `except` to specify actions; and `if` and `unless` to specify procs to filter individual requests.
 
-    * Note that we can only protect GET paths, and also think about making sure you DON'T protect
-      any path your front-end needs JS `fetch` access to, as this would block it (at least
-      without custom front-end code we haven't really explored)
+  * Note that we can only protect GET paths, and also think about making sure you DON'T protect
+    any path your front-end needs JS `fetch` access to, as this would block it (at least
+    without custom front-end code we haven't really explored)
 
-    * If you are tempted to just protect `/` that may work, but you may need to exclude hearbeat paths, front-end (AJAX) requestable paths, API endpoints, uptime checker requests, or other machine-access-desired paths. These may be good candidates for an `unless` parameter, or the `skip_when` configuration.
+  * If you are tempted to just protect `/` that may work, but you may need to exclude hearbeat paths, front-end (AJAX) requestable paths, API endpoints, uptime checker requests, or other machine-access-desired paths. These may be good candidates for an `unless` parameter, or the `skip_when` configuration.
 
-    * The author is a librarian who believes maintaining machine access in general is a public good, and tries to limit access with a bot challenge to the minimum paths necessary for app sustainability.
+  * The author is a librarian who believes maintaining machine access in general is a public good, and tries to limit access with a bot challenge to the minimum paths necessary for app sustainability.
 
-    * The default configuration only allows re-use of a 'pass' cookie from requests with same IP address subnet and user-agent-related headers. This can be customized.
+  * The default configuration only allows re-use of a 'pass' cookie from requests with same IP address subnet and user-agent-related headers. This can be customized.
 
 ```ruby
 class WidgetController < ApplicationController
@@ -195,6 +195,7 @@ class CatalogController < ApplicationController
   }
 
 end
+```
 
 ## Development and automated testing
 
