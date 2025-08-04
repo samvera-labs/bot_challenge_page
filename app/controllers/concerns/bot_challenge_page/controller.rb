@@ -10,7 +10,7 @@ module BotChallengePage
                         by: ->{
                           instance_exec(challenge_controller.bot_challenge_config, &challenge_controller.bot_challenge_config.default_limit_by)
                         },
-                        store: challenge_controller.bot_challenge_config.store || cache_store,
+                        store: nil,
                         counter: nil,
                         **before_action_options)
 
@@ -27,7 +27,7 @@ module BotChallengePage
             raise ArgumentError.new("either both or neither of `after` and `within` must be speciied")
           end
 
-          self._bot_challenge_rate_limit_with_context(to: after, within: within, by: by,  store: store,
+          self._bot_challenge_rate_limit(to: after, within: within, by: by,  store: store,
             context: ["bot_challenge", counter].compact.join('.'),
             with: ->{
               challenge_controller.bot_challenge_guard_action(self)
@@ -44,28 +44,36 @@ module BotChallengePage
       end
 
 
-      # Copied from https://github.com/rails/rails/pull/55299, it's just rails rate_limit with added
-      # `context` arg which we need
+      # A copy-paste-customize of Rails rate_limit at
+      # https://github.com/rails/rails/blob/9a64857d7002554b0af94158de386def5bfef9d3/actionpack/lib/action_controller/metal/rate_limiting.rb#L55
       #
-      # https://github.com/rails/rails/pull/55299/commits/b9b7a7a8ab6e50c654619ae42e2b342ab7617f91
+      # For two purposes:
       #
-      # If this is merged into rails in future, we can use plain old rate_limit
+      # 1. Apply 'context' argument from https://github.com/rails/rails/pull/55299 (not merged when I write this)
       #
-      def _bot_challenge_rate_limit_with_context(to:, within:, by: -> { request.remote_ip }, with: -> { head :too_many_requests }, store: cache_store, name: nil, context: nil, **options)
-        before_action -> { _bot_challenge_rate_limiting_with_context(to: to, within: within, by: by, with: with, store: store, name: name, context: context) }, **options
+      # 2. Make 'store' defaults calculated _at execution time_ rather than definition time, which is
+      #    convenient for being able to mock config in applicaiton tests.
+      #
+      def _bot_challenge_rate_limit(to:, within:, by: -> { request.remote_ip }, with: -> { head :too_many_requests }, store: nil, name: nil, context: nil,
+            challenge_controller: BotChallengePage::BotChallengePageController,  # to get config for store default
+            **options)
+        before_action -> {
+          _bot_challenge_rate_limiting(to: to,
+                                        within: within,
+                                        by: by,
+                                        with: with,
+                                        store: store || challenge_controller.bot_challenge_config.store || cache_store,
+                                        name: name,
+                                        context: context)
+        }, **options
       end
     end
 
     private
 
-    # Copied from https://github.com/rails/rails/pull/55299, it's just rails rate_limit with added
-    # `context` arg which we need
+    # See above at _bot_challenge_rate_limit
     #
-    # https://github.com/rails/rails/pull/55299/commits/b9b7a7a8ab6e50c654619ae42e2b342ab7617f91
-    #
-    # If this is merged into rails in future, we can use plain old rate_limit
-    #
-    def _bot_challenge_rate_limiting_with_context(to:, within:, by:, with:, store:, name:, context:)
+    def _bot_challenge_rate_limiting(to:, within:, by:, with:, store:, name:, context:)
       by = instance_exec(&by)
       cache_key = ["rate-limit", context || controller_path, name, by].compact.join(":")
       count = store.increment(cache_key, 1, expires_in: within)
