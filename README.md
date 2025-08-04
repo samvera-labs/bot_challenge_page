@@ -92,7 +92,7 @@ The challenge page by default will be displayed in your app's default rails `lay
 To customize the layout or challenge page HTML more further, you can use configuration to supply a `render` method for the controller pointing to your own templates or other layouts. You will probably want to re-use the partials we use in our default template, for standard functionality. And you'll want to provide `<template>` elements with the same id's for those elements, but can put whatever you want inside the templates!
 
 ```ruby
-BotChallengePage::BotChallengePageController.bot_challenge_config.challenge_renderer = ()->  {
+config.challenge_renderer = ()->  {
   render "my_local_view_folder/whatever", layout "another_layout"
 }
 ```
@@ -107,7 +107,7 @@ If you'd like to log or observe challenge issues, you can configure a proc that 
 in the context of the controller, and is called when a page is blocked by a challenge.
 
 ```ruby
-BotChallengePage::BotChallengePageController.bot_challenge_config.after_blocked = (_bot_challenge_class)->  {
+config.after_blocked = (_bot_challenge_class)->  {
   logger.info("page blocked by challenge: #{request.uri}")
 }
 ```
@@ -115,7 +115,7 @@ BotChallengePage::BotChallengePageController.bot_challenge_config.after_blocked 
 Or, here's how I managed to get it in [lograge](https://github.com/roidrage/lograge), so a page blocked results in a `bot_chlng=true` param in a lograge line.
 
 ```ruby
-BotChallengePage::BotChallengePageController.bot_challenge_config.after_blocked =
+config.after_blocked =
   ->(bot_detect_class) {
     request.env["bot_detect.blocked_for_challenge"] = true
   }
@@ -128,6 +128,8 @@ config.lograge.custom_payload do |controller|
   }.compact
 end
 ```
+
+Later, however, using similar mechanism, I actually suppressed logging of actions that resulted in bot challenges altogether -- they were exhausting my log platform quota.
 
 ## Example possible Blacklight config
 
@@ -143,18 +145,18 @@ Many of us in my professional community use [blacklight](https://github.com/proj
 
 ```ruby
 # ./config/initializers/bot_challenge_page.rb
-Rails.application.config.to_prepare do
-  BotChallengePage::BotChallengePageController.bot_challenge_config.enabled = true
+BotChanngePage.configure do
+  config.enabled = true
 
   # Need to set store to a Rails cache store other than null store, if you want to track
-  # rate limits.
-  BotChallengePage::BotChallengePageController.bot_challenge_config.store = :redis_store
+  # rate limits.  We chooes to use a different store than Rails.cache.
+  config.store = ActiveSupport::Cache::RedisCacheStore.new(url: $some_redis_url)
 
   # Get from CloudFlare Turnstile: https://www.cloudflare.com/application-services/products/turnstile/
-  BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = "MUST GET"
-  BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = "MUST GET"
+  config.cf_turnstile_sitekey = "MUST GET"
+  config.cf_turnstile_secret_key = "MUST GET"
 
-  BotChallengePage::BotChallengePageController.bot_challenge_config.skip_when = ->(config) {
+  config.skip_when = ->(config) {
     # Exempt honeybadger token to allow HB uptime checker in
     # https://docs.honeybadger.io/guides/security/
     (
