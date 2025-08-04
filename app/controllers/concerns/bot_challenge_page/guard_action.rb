@@ -3,21 +3,18 @@ module BotChallengePage
   # Extracted to concern in separate file mostly for readability, not expected to be used
   # anywehre but BotChallengePageController -- we hang all logic off controller to allow multiple
   # controllers in an app, and over-ride in sub-classes.
-  module EnforceFilter
+  module GuardAction
     extend ActiveSupport::Concern
 
     class_methods do
-      # Usually in your ApplicationController, unless using `immediate`.
+      # All the logic for enforcing bot challenge protection, usually in a before_filter
+      # of some kind, direct or rate_limit.
       #
-      #     before_action { |controller| BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller) }
-      #
-      # @param immediate [Boolean] always force bot protection, ignore any allowed pre-challenge rate limit
-      def bot_challenge_enforce_filter(controller, immediate: false)
+      # Render challenge page when necessary, otherwise do nothing allowing ordinary rails render.
+      def bot_challenge_guard_action(controller)
         if self.bot_challenge_config.enabled &&
-            (controller.request.env[self.bot_challenge_config.env_challenge_trigger_key] || immediate) &&
             ! self._bot_detect_passed_good?(controller.request) &&
-            ! controller.kind_of?(self) && # don't ever guard ourself, that'd be a mess!
-            ! self.bot_challenge_config.allow_exempt.call(controller, self.bot_challenge_config)
+            ! controller.kind_of?(self) # don't ever guard ourself, that'd be a mess!
 
           # we can only do GET requests right now
           if !controller.request.get?
@@ -49,10 +46,12 @@ module BotChallengePage
 
         return false unless session_data && session_data.kind_of?(Hash)
 
-        datetime = session_data[BotChallengePageController::SESSION_DATETIME_KEY]
-        ip   = session_data[BotChallengePageController::SESSION_IP_KEY]
+        datetime = session_data[self::SESSION_DATETIME_KEY]
 
-        (ip == request.remote_ip) && (Time.now - Time.iso8601(datetime) < self.bot_challenge_config.session_passed_good_for )
+        fingerprint   = session_data[self::SESSION_FINGERPRINT_KEY]
+
+        (Time.now - Time.iso8601(datetime) < self.bot_challenge_config.session_passed_good_for ) &&
+        fingerprint == self.bot_challenge_config.session_valid_fingerprint.call(request)
       end
     end
   end

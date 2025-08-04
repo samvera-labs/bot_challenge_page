@@ -51,7 +51,7 @@ RSpec.describe BotChallengePage::BotChallengePageController, type: :controller d
       expect(session[described_class.bot_challenge_config.session_passed_key]).to be_present
       expect(Time.iso8601(session[described_class.bot_challenge_config.session_passed_key][described_class::SESSION_DATETIME_KEY])).to be_within(60).of(Time.now.utc)
 
-      expect(described_class._bot_detect_passed_good?(controller.request)).to be true
+      expect(described_class._bot_detect_passed_good?(request)).to be true
     end
 
     it "handles turnstile failure" do

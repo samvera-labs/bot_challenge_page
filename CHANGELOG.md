@@ -1,3 +1,16 @@
+## 0.10.0
+
+* Large rewrite of how configuration is done, very backwards compatible
+  * Sorry, this is pre-1.0 -- but we are on the right track now, and expect to go 1.0 soon
+    with little or no subsequent backwards incompat!
+  * It should not be too hard to rewrite your config and directives, and hopefully should
+    be much simpler as well as more flexible -- different rate limits on different paths or other request criteria are now possible. Please consult new README
+  * You may need to remove much of your previous code -- if it's broken it should raise, don't
+    worry about it doing the wrong thing or anything like that.
+
+* rack-attack is no longer a dependency or used for rate limits -- you still need a stateful cache store of some kind for rate limits.
+
+
 ## 0.4.0
 
 * Expand default buckets for rate limits to  /16 for IPv4 (x.y.*.*), and /64 for IPv6. https://github.com/samvera-labs/bot_challenge_page/pull/11

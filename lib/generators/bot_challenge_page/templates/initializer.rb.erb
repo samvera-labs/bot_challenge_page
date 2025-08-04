@@ -1,56 +1,64 @@
-Rails.application.config.to_prepare do
+BotChallengePage.configure do |config|
 
-  BotChallengePage::BotChallengePageController.bot_challenge_config.enabled = true
+  # Can globally disable in configuration if desired
+  config.enabled = true
 
   # Get from CloudFlare Turnstile: https://www.cloudflare.com/application-services/products/turnstile/
   # Some testing keys are also available: https://developers.cloudflare.com/turnstile/troubleshooting/testing/
   #
   # Always pass testing sitekey: "1x00000000000000000000AA"
-  BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = "MUST GET"
+  config.cf_turnstile_sitekey = "MUST GET"
   # Always pass testing secret_key: "1x0000000000000000000000000000000AA"
-  BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = "MUST GET"
+  config.cf_turnstile_secret_key = "MUST GET"
 
-  BotChallengePage::BotChallengePageController.bot_challenge_config.redirect_for_challenge = <%= options[:redirect_for_challenge] %>
 
-  <%- if options[:rack_attack] %>
-  # What paths do you want to protect?
+  <%- if options[:redirect_for_challenge] -%>
+    config.redirect_for_challenge = <%= options[:redirect_for_challenge] %>
+  <% end %>
+
+  # For rate-limiting, we need a rails cache store that keeps state, by default
+  # will use `config.action_controller.cache_store` or Rails.cache, but if you'd
+  # like to use a separate store database, eg. :
+  # config.store = ActiveSupport::Cache::RedisCacheStore.new(url: "...")
+
+  # Filter to omit requests from bot challenge control, executed in controller instance context
   #
-  # You can use path prefixes: "/catalog" or even "/"
+  # config.skip_when = ->(config) {
+  #   # maybe you want to globally exempt a heartbeat path
+  #   current_page?(rails_health_check_path) ||
   #
-  # Or hashes with controller and/or action:
-  #
-  #   { controller: "catalog" }
-  #   { controller: "catalog", action: "index" }
-  #
-  # Note that we can only protect GET paths, and also think about making sure you DON'T protect
-  # any path your front-end needs JS `fetch` access to, as this would block it (at least
-  # without custom front-end code we haven't really explored)
-
-  BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limited_locations = [
-  ]
-
-  # allow rate_limit_count requests in rate_limit_period, before issuing challenge
-  BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_period = 12.hour
-  BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_count = 2
-  <% end -%>
-
-  # How long will a challenge success exempt a session from further challenges?
-  # BotChallengePage::BotChallengePageController.bot_challenge_config.session_passed_good_for = 36.hours
-
-  # Exempt some requests from bot challenge protection
-  # BotChallengePage::BotChallengePageController.bot_challenge_config.allow_exempt = ->(controller) {
-  #   # controller.params
-  #   # controller.request
-  #   # controller.session
-
   #   # Here's a way to identify browser `fetch` API requests; note
-  #   # it can be faked by an "attacker"
-  #   controller.request.headers["sec-fetch-dest"] == "empty"
+  #   # it can be faked by an "attacker" so you might not want to do this globally
+  #   (request.headers["sec-fetch-dest"] == "empty") ||
+  #
+  #   # Maybe you want to exempt an uptime checker or other trusted bot
+  #   #based on shared secret
+  #   (headers["x-some-secret"] == "some_shared_secret")
   # }
 
-  # More configuration is available
+  # Hook after a bot challenge is presented, for logging or other
+  # config.after_blocked = ->(bot_challenge_controller) {
+  # }
 
-  <%- if options[:rack_attack] %>
-  BotChallengePage::BotChallengePageController.rack_attack_init
-  <% end %>
+
+  # How long will a challenge success exempt a session from further challenges?
+  # config.session_passed_good_for = 36.hours
+
+
+  # Functions like to Rails rate_limit `by` parameter, as a configured default.
+  # A discriminator or identifier in which a client's requests will be bucketted
+  # by rate limit. Normally this gem buckets by IP address subnets. Switching
+  # to individual IPs would be much more generous:
+  # config.default_limit_by = ->(config) {
+  #   request.remote_ip
+  #  }
+
+  # When a "pass" cookie is saved, a fingerprint value is stored with it,
+  # and subsequent uses of the pass need to have a request that matches
+  # fingerprint. By default we insist on IP subnet match, and same user-agent
+  # and other headers. But can be customized.
+  # config.session_valid_fingerprint = ->(request) {
+  #    # whatever
+  # }
+
 end

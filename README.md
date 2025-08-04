@@ -2,16 +2,15 @@
 
 [![CI](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml/badge.svg)](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml) [![Gem Version](https://badge.fury.io/rb/bot_challenge_page.png)](http://badge.fury.io/rb/bot_challenge_page)
 
-BotChallengePage lets you protect certain routes in your Rails app with [CloudFlare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/) "CAPTHCA alternate" bot detector. Rather than the typical form submission use case for Turnstile, the user will be redirected to an interstitial challenge page, and automatically redirected back immediately on success.
+BotChallengePage lets you protect certain **GET** routes in your Rails app with [CloudFlare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/) "CAPTHCA alternate" bot detector. Rather than the typical form submission use case for Turnstile, the user will be redirected to an interstitial challenge page, and automatically redirected back immediately on success.
 
-The motivating use case is fairly dumb (probably AI-related) crawlers, rather than targetted attacks, although we have tried to pay attention to security.  Many of our use cases were crawlers getting caught following every combination of voluminous facet values in search results in a near "infinite space", and causing us resource usage issues.
+The motivating use case is fairly dumb (probably AI-related) crawlers crawling search results pages, rather than targetted attacks, although we have tried to pay attention to security.  Many of our use cases were crawlers getting caught following every combination of voluminous facet values in search results in a near "infinite space", and causing us resource usage issues.
 
 ![challenge page screenshot](docs/challenge-page-example.png)
 
-* You can optionally configure a rate limit that is allowed BEFORE the challenge is triggered
-  * Uses rack-attack to track rate, requires `Rails.cache` or `Rack::Attack.cache.store` to be set to a persistent shared high-performance cache, probably redis or memcached.
+* Support both immediate bot challenge, or optionally a rate limit that will trigger a bot challenge.
 
-* Once a challenge is passed, the pass is stored in a cookie, and a challenge won't be redisplayed for a configurable amount of time, so long as cookie is present
+* Once a challenge is passed, the pass is stored in a cookie, and a challenge won't be redisplayed for a configurable amount of time, so long as cookie is present, and client matches a configurable user-agent/IP address fingerprint.
 
 * **Note:** User-agent does always need both cookies and javascript enabled to be able to pass challenge and get through!
 
@@ -23,30 +22,64 @@ The motivating use case is fairly dumb (probably AI-related) crawlers, rather th
 * `bundle add bot_challenge_page`, `bundle install`
 
 * Run the installer
-  * if you want to use rack-attack for some permissive pre-challenge rate, `rails g bot_challenge_page:install`
+  * `rails g bot_challenge_page:install`
+  * This will add a line to your ApplicationController to include a mixin to provide a `bot_challenge` configuration method in your controllers
+  * And a template configuration page at `./config/initializers/bot_challenge_page.rb`
 
-  * If you do not want to use rack-attack and want challenge on FIRST request, `rails g bot_challenge_page:install --no-rack-attack`
-
-  * By default challenge pages are "inline" at protected URL. To redirect to a separate challenge page URL instead, `--redirect-for-challenge`
-
-* If you are **not using rack-attack**, you need to add a before_action to the controller(s)
-  you'd like to protect, eg:
-
-        before_action only: :index do |controller|
-          BotChallengePage::BotChallengePageController.bot_challenge_enforce_filter(controller, immediate: true)
-        end
 
 
 * Configure in the generated `./config/initializers/bot_challenge_page.rb`
-  * At a minimum you need to configure your Cloudflare Turnstile keys, and some paths to protect!
+  * At a minimum you need to configure your Cloudflare Turnstile keys
+
+  * Some other configuration options are offered -- more advanced/specialized ones are available that are not mentioned in generated config file, see [Config class](./app/models/bot_challenge_page/config.rb)
+
+## Protect some paths
+
+You can add `bot_challenge` to a controller to protect all actions in that controller with a bot challenge.
+
+You can also use all the Rails `before_action` params to apply to only some actions or requests in that controller: `only` and `except` to specify actions; and `if` and `unless` to specify procs to filter individual requests.
+
     * Note that we can only protect GET paths, and also think about making sure you DON'T protect
       any path your front-end needs JS `fetch` access to, as this would block it (at least
       without custom front-end code we haven't really explored)
 
-    * If you are tempted to just protect `/` that may work, but worth thinking about any hearbeat paths, front-end requestable paths, or other machine-access-desired paths.
+    * If you are tempted to just protect `/` that may work, but you may need to exclude hearbeat paths, front-end (AJAX) requestable paths, API endpoints, uptime checker requests, or other machine-access-desired paths. These may be good candidates for an `unless` parameter, or the `skip_when` configuration.
 
-  * Some other configuration options are offered -- more advanced/specialized ones are available that are not mentioned in generated config file, see [Config class](./app/models/bot_challenge_page/config.rb)
+    * The author is a librarian who believes maintaining machine access in general is a public good, and tries to limit access with a bot challenge to the minimum paths necessary for app sustainability.
 
+    * The default configuration only allows re-use of a 'pass' cookie from requests with same IP address subnet and user-agent-related headers. This can be customized.
+
+```ruby
+class WidgetController < ApplicationController
+  bot_challenge only: :index, unless: -> { headers['x-secret-code'] == "i_am_uptime-checker" }
+end
+```
+
+### Protect some paths with a rate limit
+
+If you want to display a bot challenge only after some rate is reached, you will need some [Rails cache store configured](https://guides.rubyonrails.org/caching_with_rails.html#configuration) to keep track of rate.  You can configure `Rails.config.cache`, or for bot_challenge_page specifically in it's config.
+
+* Redis or Memcached are typical, but the `memory_store` cache can work if you don't mind your rate limits being only approximate -- they will reset on every web server process restart, and if you have more than one web server process they will each have their own rate limit.
+
+You use the `after` and `within` argument to `bot_challenge` to include a rate limit. `only`, `except`, `if`, and `unless` are still supported.
+
+```ruby
+class WidgetController < ApplicationController
+  bot_challenge after: 2, within: 3.hours, only: :index, if: -> { request_has_facet_limits? }
+end
+```
+
+#### rate limit counters
+
+By default, all `bot_challenge` directives share a rate limit counter. So if two differnet controllers have a `bot_challenge`, requests to either one add to the same counter for rate limit checks.
+
+Which also means if you have more than one `bot_challenge` that can apply to the _same request_, it might get double-counted (or more-counted).  (Also too many rate-limited bot_challenges applying to the same request could have performance implications).
+
+To avoid this problem or achieve desired behavior, you can pass a `counter` string into `bot_challenge` to declare separate counteres and decide which `bot_challenge` should or should not share counters.
+
+The `counter` arg has overlapping use but distinct effect from passing in a `by` argument or setting `config.default_limit_by`, which lets you determine how user-agents are identified to share a counter bucket, which by default buckets clients by IP subnet, not just individual IP.
+
+If a given request does not apply to `bot_challenge` because of `only`, `except`, `if`, `unless` or `config.skip_when` -- it **does not count toward rate limit either**.
 
 ## Customize challenge page display
 
@@ -101,41 +134,65 @@ end
 Many of us in my professional community use [blacklight](https://github.com/projectblacklight/blacklight).  Here's a possible sample blacklight config to:
 
 * Protect default catalog controller, including search results and any other actions
-* But give the user 3 free searches in a 36 hour period before challenged
-* For the #facet action used for "facet… more" links --  exempt from protection if the request is being made by a browser JS `fetch`, we just let those through. (Which means a determined attacker could do that on purpose, not defense against on purpose DDoS)
+* ONLY if the search includes a query string or facet limit -- allow unfiltered search, including pagination, without bot challenge.
+* Even for queried or limite results, give an IP subnet 1 free searches in a 36 hour period before challenged
+* For the action used for "facet… more" links and `blacklight_range_limit` that need to be XHR/JS-fetchable --  exempt from protection if the request is being made by a browser JS `fetch`, we just let those through. (Which means a determined attacker could do that on purpose, not defense against on purpose DDoS)
+* Let's an uptime checker in based on secret code in headers
+
+
 
 ```ruby
+# ./config/initializers/bot_challenge_page.rb
 Rails.application.config.to_prepare do
   BotChallengePage::BotChallengePageController.bot_challenge_config.enabled = true
+
+  # Need to set store to a Rails cache store other than null store, if you want to track
+  # rate limits.
+  BotChallengePage::BotChallengePageController.bot_challenge_config.store = :redis_store
 
   # Get from CloudFlare Turnstile: https://www.cloudflare.com/application-services/products/turnstile/
   BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_sitekey = "MUST GET"
   BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_secret_key = "MUST GET"
 
-  BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limited_locations = [
-    "/catalog"
-  ]
-
-  # allow rate_limit_count requests in rate_limit_period, before issuing challenge
-  BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_period = 36.hour
-  BotChallengePage::BotChallengePageController.bot_challenge_config.rate_limit_count = 3
-
-  BotChallengePage::BotChallengePageController.allow_exempt = ->(controller, config) {
-    # Excempt any Catalog #facet or #range_limit action that looks like an ajax/fetch request, the # challenge isn't going to work there, we just exempt it.
-    #
-    # sec-fetch-dest is set to 'empty' by browser on fetch requests, to limit us further;
-    # sure an attacker could fake it, we don't mind if someone determined can avoid
-    # bot challenge on this one action
-    ( controller.params[:action].in?(["facet", "range_limit"]) &&
-      controller.request.headers["sec-fetch-dest"] == "empty" &&
-      controller.kind_of?(CatalogController)
+  BotChallengePage::BotChallengePageController.bot_challenge_config.skip_when = ->(config) {
+    # Exempt honeybadger token to allow HB uptime checker in
+    # https://docs.honeybadger.io/guides/security/
+    (
+      ENV['HONEYBADGER_TOKEN'].present? &&
+      controller.request.headers['Honeybadger-Token'] == ENV['HONEYBADGER_TOKEN']
     )
   }
 
-  BotChallengePage::BotChallengePageController.rack_attack_init
 end
-
 ```
+
+```ruby
+# ./app/controllers/catalog_controller.rb
+class CatalogController < ApplicationController
+  # from default blacklight first...
+  include Blacklight::Catalog
+  include BlacklightRangeLimit::ControllerOverride
+
+   # This should apply to all CatalogController sub-classes too, which include CollectionShowController and
+  # FeaturedTopicController. They all share a counter though.
+  #
+  # We let bots through if they have NO query params, we want let collection/focus sploash
+  # pages be indexed -- this will actually let bot paginate through entire results with
+  # no query/facets, which we seem to be able to tolerate.
+  #
+  bot_challenge after: 1, within: 12.hours,
+    if: -> {
+      has_search_parameters?
+    },
+    except: ["facet", "range_limit"]
+
+  # facet and range_limit both get challenged immediately, unless they are JS fetch,
+  # in which case they are let in freely.
+  bot_challenge only: ["facet", "range_limit"], unless: -> {
+    request.headers["sec-fetch-dest"] == "empty"
+  }
+
+end
 
 ## Development and automated testing
 
@@ -153,12 +210,11 @@ If you make any changes to `Gemfile` you may need to run `bundle exec appraisal 
 
 ## Possible future features?
 
-* allow regex in default location_matcher? Easy to do if you want it, just say so.
-
 * We could support swap-in Turnstile-alternatives, like [hCAPTHCA](https://www.hcaptcha.com/), [Google reCAPTCHA v3](https://developers.google.com/recaptcha/docs/v3), or even open source proof of work implementations like [ALTCHA](https://altcha.org/docs/get-started/), [pow-bot-deterrent](https://github.com/sequentialread/pow-bot-deterrent), or [Friendly Captcha](https://github.com/FriendlyCaptcha/friendly-captcha-sdk).  But the (free) cost/benefit of Turnstile are pretty good, so I don't myself have a lot of motivation to add this complexity.
 
 * Something to make it easier to switch the challenge on only based on signals that server/app is under some defined heavy load?
 
+* Use the in-development [bot auth](https://developers.cloudflare.com/bots/concepts/bot/verified-bots/web-bot-auth/) standard, to support allow-listing of specified auth\'d bots.
 
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

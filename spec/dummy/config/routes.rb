@@ -16,7 +16,12 @@ Rails.application.routes.draw do
   get "/challenge", to: "bot_challenge_page/bot_challenge_page#challenge", as: :bot_detect_challenge
   post "/challenge", to: "bot_challenge_page/bot_challenge_page#verify_challenge"
 
-  get "/dummy", to: "dummy#index", as: :dummy
-  get "/dummy_download", to: "dummy#download", as: :dummy_download
-  get "/dummy_immediate", to: "dummy_immediate#index", as: :dummy_immediate
+
+  # dummy app paths we are testing
+  get "/dummy/immediate", to: "dummy_rate_limit#immediate", as: :dummy_immediate
+  get "/dummy/rate_limit_1", to: "dummy_rate_limit#rate_limit_1", as: :dummy_rate_limit_1
+  get "/dummy/download", to: "dummy_rate_limit#download", as: :dummy_download
+
+  get "/alternate_dummy/rate_limit_1", to: "alternate_dummy_rate_limit#rate_limit_1", as: :alternate_dummy_rate_limit_1
+  get "/alternate_dummy/rate_limit_1_with_separate_counter", to: "alternate_dummy_rate_limit#rate_limit_1_with_separate_counter", as: :alternate_dummy_rate_limit_1_with_separate_counter
 end

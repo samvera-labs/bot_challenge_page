@@ -1,3 +1,3 @@
 module BotChallengePage
-  VERSION = "0.4.0"
+  VERSION = "0.10.0"
 end

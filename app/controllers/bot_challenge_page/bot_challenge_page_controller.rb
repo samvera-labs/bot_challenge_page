@@ -11,20 +11,17 @@ require 'http'
 #
 module BotChallengePage
   class BotChallengePageController < ::ApplicationController
-    include BotChallengePage::RackAttackInit
-    include BotChallengePage::EnforceFilter
+    include BotChallengePage::GuardAction
 
-    # Config for bot detection is held in class object here -- idea is
-    # to support different controllers with different config protecting
-    # different paths in your app if you like, is why config is with controller
-    class_attribute :bot_challenge_config, default: ::BotChallengePage::Config.new
+    # We access all config at the controller level, intending to support
+    # a design of different controllers in the same app with different config, protecting
+    # different parts of your app.
+    #
+    # But most people won't use that, just default to a global config for simplicity.
+    class_attribute :bot_challenge_config, default: ::BotChallengePage.config
 
     SESSION_DATETIME_KEY = "t"
-    SESSION_IP_KEY = "i"
-
-    # for allowing unsubscribe for testing
-    class_attribute :_track_notification_subscription, instance_accessor: false
-
+    SESSION_FINGERPRINT_KEY = "f"
 
     # only used if config.redirect_for_challenge is true
     def challenge
@@ -58,7 +55,7 @@ module BotChallengePage
         Rails.logger.info("#{self.class.name}: Cloudflare Turnstile validation passed api (#{request.remote_ip}, #{request.user_agent}): #{params["dest"]}")
         session[self.bot_challenge_config.session_passed_key] = {
           SESSION_DATETIME_KEY => Time.now.utc.iso8601,
-          SESSION_IP_KEY   => request.remote_ip
+          SESSION_FINGERPRINT_KEY   => self.bot_challenge_config.session_valid_fingerprint.call(request)
         }
       else
         Rails.logger.warn("#{self.class.name}: Cloudflare Turnstile validation failed (#{request.remote_ip}, #{request.user_agent}): #{result}: #{params["dest"]}")
