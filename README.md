@@ -31,7 +31,7 @@ The motivating use case is fairly dumb (probably AI-related) crawlers crawling s
 * Configure in the generated `./config/initializers/bot_challenge_page.rb`
   * At a minimum you need to configure your Cloudflare Turnstile keys
 
-  * Some other configuration options are offered -- more advanced/specialized ones are available that are not mentioned in generated config file, see [Config class](./app/models/bot_challenge_page/config.rb)
+  * Some other configuration options are offered -- more advanced/specialized ones are available that are not mentioned in generated config file, see [Config class](./lib/bot_challenge_page/config.rb)
 
 ## Protect some paths
 
