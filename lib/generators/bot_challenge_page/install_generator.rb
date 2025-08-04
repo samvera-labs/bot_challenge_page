@@ -13,6 +13,10 @@ module BotChallengePage
       end
     end
 
+    def add_controller_mixin
+      inject_into_class "app/controllers/application_controller.rb", "ApplicationController", "  include BotChallengePage::Controller\n"
+    end
+
     def copy_initializer_file
       template "initializer.rb.erb", "config/initializers/bot_challenge_page.rb"
     end

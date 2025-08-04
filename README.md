@@ -2,15 +2,15 @@
 
 [![CI](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml/badge.svg)](https://github.com/samvera-labs/bot_challenge_page/actions/workflows/ci.yml) [![Gem Version](https://badge.fury.io/rb/bot_challenge_page.png)](http://badge.fury.io/rb/bot_challenge_page)
 
-BotChallengePage lets you protect certain routes in your Rails app with [CloudFlare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/) "CAPTHCA alternate" bot detector. Rather than the typical form submission use case for Turnstile, the user will be redirected to an interstitial challenge page, and automatically redirected back immediately on success.
+BotChallengePage lets you protect certain **GET** routes in your Rails app with [CloudFlare Turnstile](https://www.cloudflare.com/application-services/products/turnstile/) "CAPTHCA alternate" bot detector. Rather than the typical form submission use case for Turnstile, the user will be redirected to an interstitial challenge page, and automatically redirected back immediately on success.
 
-The motivating use case is fairly dumb (probably AI-related) crawlers, rather than targetted attacks, although we have tried to pay attention to security.  Many of our use cases were crawlers getting caught following every combination of voluminous facet values in search results in a near "infinite space", and causing us resource usage issues.
+The motivating use case is fairly dumb (probably AI-related) crawlers crawling search results pages, rather than targetted attacks, although we have tried to pay attention to security.  Many of our use cases were crawlers getting caught following every combination of voluminous facet values in search results in a near "infinite space", and causing us resource usage issues.
 
 ![challenge page screenshot](docs/challenge-page-example.png)
 
 * Support both immediate bot challenge, or optionally a rate limit that will trigger a bot challenge.
 
-* Once a challenge is passed, the pass is stored in a cookie, and a challenge won't be redisplayed for a configurable amount of time, so long as cookie is present
+* Once a challenge is passed, the pass is stored in a cookie, and a challenge won't be redisplayed for a configurable amount of time, so long as cookie is present, and client matches a configurable user-agent/IP address fingerprint.
 
 * **Note:** User-agent does always need both cookies and javascript enabled to be able to pass challenge and get through!
 
