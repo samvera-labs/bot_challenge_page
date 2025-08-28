@@ -31,6 +31,16 @@ module BotChallengePage
           else
             # hacky way to get config to view template in an arbitrary controller, good enough for now
             controller.instance_variable_set("@bot_challenge_config", self.bot_challenge_config) unless controller.instance_variable_get("@bot_challenge_config")
+
+            # set preload HTTP header with turnstile url for better page speed
+            # May or may not be one there already, we can always add on
+            preload_link_value = %Q{<#{self.bot_challenge_config.cf_turnstile_js_url}>; rel=preload; as=script}
+            if controller.headers["link"].present?
+              controller.headers["link"] += ",#{preload_link_value}"
+            else
+              controller.headers["link"] = "#{preload_link_value}"
+            end
+
             controller.instance_exec &self.bot_challenge_config.challenge_renderer
           end
 
