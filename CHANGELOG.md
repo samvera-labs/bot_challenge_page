@@ -1,3 +1,9 @@
+##
+
+* 0.11.0
+
+* provide HTTP link header to preload turnstile script src, for page speed performance of challenge page https://github.com/samvera-labs/bot_challenge_page/pull/15
+
 ## 0.10.0
 
 * Large rewrite of how configuration is done, very backwards compatible

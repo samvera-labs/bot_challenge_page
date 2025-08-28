@@ -19,6 +19,9 @@ describe DummyRateLimitController, type: :controller do
       expect(response).to have_http_status(403)
       expect(response.headers["Cache-Control"]).to eq "no-store"
       expect(response.body).to include I18n.t("bot_challenge_page.title")
+
+      preload_link = BotChallengePage::BotChallengePageController.bot_challenge_config.cf_turnstile_js_url
+      expect(response.headers["link"]).to match /(,|^)\<#{preload_link}\>; rel=preload; as=script(,|$)/
     end
 
     it "displays actual page if we have stored a pass in session" do
