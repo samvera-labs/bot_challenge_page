@@ -2,7 +2,9 @@
 
 ## 1.0.0
 
-No change from 0.11.0, decided to call it a 1.0 release.
+* No logic change from 0.11.0, decided to call it a 1.0 release.
+
+* Allow and CI on Rails 8.1 (no logic changes required)
 
 ## 0.11.0
 
