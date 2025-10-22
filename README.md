@@ -238,4 +238,6 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 * And yet another implementation in Rails that perhaps makes more assumptions about use cases, [turnstile-captcha](https://github.com/pfeiffer/turnstile-captcha). Haven't looked at it much.
 
+* Great article summarizing our community of practice's knowledge of bot defenses, written after this gem: [Mitigating Aggressive Crawler Traffic in the Age of Generative AI: A Collaborative Approach from the University of North Carolina at Chapel Hill Libraries](https://journal.code4lib.org/articles/18489), by Jason Casden, David Romani, Tim Shearer, and Jeff Campbell, Code4Lib Journal Issue 61, 2025-10-21
+
 

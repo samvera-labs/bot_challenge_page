@@ -1,6 +1,10 @@
 ##
 
-* 0.11.0
+## 1.0.0
+
+No change from 0.11.0, decided to call it a 1.0 release.
+
+## 0.11.0
 
 * provide HTTP link header to preload turnstile script src, for page speed performance of challenge page https://github.com/samvera-labs/bot_challenge_page/pull/15
 
