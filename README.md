@@ -112,6 +112,16 @@ config.after_blocked = (_bot_challenge_class)->  {
 }
 ```
 
+If you'd like to log every time a request is let through because it has a verified session pass,
+which could be a lot of data, use `after_session_pass`.
+
+```ruby
+config.after_session_pass = (_bot_challenge_class)->  {
+  logger.info("page allowed through by session pass: #{request.uri}")
+}
+```
+
+
 Or, here's how I managed to get it in [lograge](https://github.com/roidrage/lograge), so a page blocked results in a `bot_chlng=true` param in a lograge line.
 
 ```ruby

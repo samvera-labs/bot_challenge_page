@@ -13,7 +13,7 @@ module BotChallengePage
       # Render challenge page when necessary, otherwise do nothing allowing ordinary rails render.
       def bot_challenge_guard_action(controller)
         if self.bot_challenge_config.enabled &&
-            ! self._bot_detect_passed_good?(controller.request) &&
+            ! self._bot_detect_passed_good?(controller) &&
             ! controller.kind_of?(self) # don't ever guard ourself, that'd be a mess!
 
           # we can only do GET requests right now
@@ -51,7 +51,9 @@ module BotChallengePage
 
       # Does the session already contain a bot detect pass that is good for this request
       # Tie to IP address to prevent session replay shared among IPs
-      def _bot_detect_passed_good?(request)
+      def _bot_detect_passed_good?(controller)
+        request = controller.request
+
         session_data = request.session[self.bot_challenge_config.session_passed_key]
 
         return false unless session_data && session_data.kind_of?(Hash)
@@ -61,7 +63,9 @@ module BotChallengePage
         fingerprint   = session_data[self::SESSION_FINGERPRINT_KEY]
 
         (Time.now - Time.iso8601(datetime) < self.bot_challenge_config.session_passed_good_for ) &&
-        fingerprint == self.bot_challenge_config.session_valid_fingerprint.call(request)
+        (fingerprint == self.bot_challenge_config.session_valid_fingerprint.call(request)) &&
+        # not a real condition, just to call our hook on passed
+        (controller.instance_exec(self, &self.bot_challenge_config.after_session_passed) || true)
       end
     end
   end
