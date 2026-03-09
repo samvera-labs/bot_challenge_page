@@ -1,5 +1,9 @@
 ##
 
+## 1.1.0
+
+* after_session_passed config: We sometimes want to log or otherwise note when a request is let in because it has a session cookie pass. https://github.com/samvera-labs/bot_challenge_page/pull/20
+
 ## 1.0.0
 
 * No logic change from 0.11.0, decided to call it a 1.0 release.

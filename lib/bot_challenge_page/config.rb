@@ -45,6 +45,8 @@ module BotChallengePage
 
     attribute :after_blocked, default: ->(bot_detect_class) {}
 
+    attribute :after_session_passed, default: ->(bot_detect_class) {}
+
 
     # rate limit per subnet, follow lehigh's lead with
     # subnet: /16 for IPv4 (x.y.*.*), and /64 for IPv6 (about the same size subnet for better or worse)

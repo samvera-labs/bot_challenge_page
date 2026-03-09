@@ -110,6 +110,42 @@ describe DummyRateLimitController, type: :controller do
         expect($arg).to be BotChallengePage::BotChallengePageController
       end
     end
+
+
+    describe "custom pass logging via after_session_passed" do
+      around do |example|
+        $triggered = false
+        $self = nil
+        $arg = nil
+        with_bot_challenge_config(BotChallengePage::BotChallengePageController,
+          after_session_passed: ->(bot_detect_class) {
+            $triggered = true;
+            $self = self;
+            $arg = bot_detect_class
+          }
+        ) { example.run }
+      end
+
+      it "does not call if not passed" do
+        get :immediate
+        expect($triggered).to be false
+      end
+
+      it "does call if passed" do
+        # store valid pass in session
+        request.session[BotChallengePage::BotChallengePageController.bot_challenge_config.session_passed_key] = {
+            BotChallengePage::BotChallengePageController::SESSION_DATETIME_KEY => Time.now.utc.iso8601,
+            BotChallengePage::BotChallengePageController::SESSION_FINGERPRINT_KEY   =>
+              BotChallengePage::BotChallengePageController.bot_challenge_config.session_valid_fingerprint.call(request)
+        }
+
+        get :immediate
+
+        expect($triggered).to be true
+        expect($self).to be_an_instance_of(described_class)
+        expect($arg).to be BotChallengePage::BotChallengePageController
+      end
+    end
   end
 
   describe "rate limited filter" do
