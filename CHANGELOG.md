@@ -1,5 +1,9 @@
 ##
 
+## 1.2.0
+
+* gemspec allow newly released http-rb 6.x https://github.com/samvera-labs/bot_challenge_page/pull/23
+
 ## 1.1.0
 
 * after_session_passed config: We sometimes want to log or otherwise note when a request is let in because it has a session cookie pass. https://github.com/samvera-labs/bot_challenge_page/pull/20

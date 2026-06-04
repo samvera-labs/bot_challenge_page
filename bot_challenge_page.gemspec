@@ -25,5 +25,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "nokogiri"
 
   spec.add_dependency "rails", ">= 7.1", "< 8.2"
-  spec.add_dependency "http", "~> 5.2"
+  spec.add_dependency "http", ">= 5.2", "< 7"
 end
